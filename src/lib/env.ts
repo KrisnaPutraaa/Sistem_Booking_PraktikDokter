@@ -3,7 +3,9 @@ import { z } from "zod";
 const publicSchema = z.object({
   NEXT_PUBLIC_SITE_URL: z.url(),
   NEXT_PUBLIC_SUPABASE_URL: z.url(),
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1),
+  // Kunci publishable (sb_publishable_...) atau anon lama. Kunci secret tidak boleh
+  // masuk ke sini karena variabel NEXT_PUBLIC ikut terkirim ke browser.
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1).refine((key) => !key.startsWith("sb_secret_")),
 });
 
 export type PublicEnv = z.infer<typeof publicSchema>;
