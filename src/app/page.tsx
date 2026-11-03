@@ -1,104 +1,99 @@
-import { Button } from "@/components/ui/button";
+import { Suspense } from "react";
 import { BorderedBox, BoxSection } from "@/components/ui/bordered-box";
-import { StatusBadge } from "@/components/ui/status-badge";
-import { UnderlineInput } from "@/components/ui/underline-input";
-import { QUEUE_STATUSES } from "@/lib/queue-status";
+import { Brand, LinkButton, PatientPage } from "@/components/patient/page-shell";
+import { SavedQueueLink } from "@/components/patient/saved-queue-link";
+import { getPracticeInfo } from "@/lib/patient/data";
+import { closedIsoDays, formatClock, formatDayGroups, splitDoctorName } from "@/lib/format";
 
-// Halaman sementara Fase 1: pratinjau komponen dasar. Diganti Beranda di Fase 3.
+const DEFAULT_PROFILE = "Pemeriksaan telinga, hidung, dan tenggorokan untuk anak dan dewasa.";
+
 export default function Home() {
   return (
-    <main className="mx-auto w-full max-w-[390px] px-6 py-8">
-      <p className="text-base font-semibold">Praktik THT</p>
+    <PatientPage
+      footer={
+        <>
+          <LinkButton href="/ambil">Ambil nomor antrean</LinkButton>
+          <SavedQueueLink />
+          <p className="mt-4 text-center text-sm text-muted">
+            Nomor antrean per hari. Jam pemeriksaan berupa perkiraan.
+          </p>
+        </>
+      }
+    >
+      <Brand />
+      <Suspense fallback={<PracticeSkeleton />}>
+        <PracticeDetails />
+      </Suspense>
+    </PatientPage>
+  );
+}
 
-      <section className="mt-10">
+async function PracticeDetails() {
+  const info = await getPracticeInfo();
+  const doctor = splitDoctorName(info.doctorName);
+  const openLabel = formatDayGroups(info.openDays);
+  const closedLabel = formatDayGroups(closedIsoDays(info.openDays));
+
+  return (
+    <>
+      <section className="mt-12">
         <p className="text-accent">Dokter Spesialis THT-KL</p>
         <h1 className="mt-2 text-4xl leading-tight font-medium tracking-tight">
-          dr. [Nama Dokter],
-          <br />
-          <span className="text-muted">Sp.THT-KL</span>
+          {doctor.name}
+          {doctor.title ? (
+            <>
+              <br />
+              <span className="text-muted">{doctor.title}</span>
+            </>
+          ) : null}
         </h1>
-        <p className="mt-4 text-base text-muted">
-          Pemeriksaan telinga, hidung, dan tenggorokan untuk anak dan dewasa.
-        </p>
+        <p className="mt-4 text-base text-muted">{info.profileText || DEFAULT_PROFILE}</p>
       </section>
 
       <BorderedBox className="mt-8">
         <BoxSection label="Jam praktik">
-          <div className="flex justify-between">
-            <span>Senin – Sabtu</span>
-            <span>18.30 – 23.00</span>
+          <div className="flex justify-between gap-4">
+            <span>{openLabel}</span>
+            <span className="shrink-0">
+              {formatClock(info.openTime)} – {formatClock(info.closeTime)}
+            </span>
           </div>
-          <div className="mt-1 flex justify-between text-muted">
-            <span>Minggu</span>
-            <span>Tutup</span>
-          </div>
+          {closedLabel ? (
+            <div className="mt-1 flex justify-between gap-4 text-muted">
+              <span>{closedLabel}</span>
+              <span className="shrink-0">Tutup</span>
+            </div>
+          ) : null}
         </BoxSection>
-        <BoxSection label="Tempat">
-          <p>[Nama klinik]</p>
-          <p className="text-muted">[Alamat praktik]</p>
-        </BoxSection>
-        <BoxSection label="Kontak">
-          <p>WhatsApp [nomor]</p>
-        </BoxSection>
+        {info.clinicName || info.address ? (
+          <BoxSection label="Tempat">
+            {info.clinicName ? <p>{info.clinicName}</p> : null}
+            {info.address ? <p className="text-muted">{info.address}</p> : null}
+          </BoxSection>
+        ) : null}
+        {info.whatsapp ? (
+          <BoxSection label="Kontak">
+            <p>WhatsApp {info.whatsapp}</p>
+          </BoxSection>
+        ) : null}
       </BorderedBox>
 
-      <h2 className="mt-12 text-sm tracking-wide text-muted uppercase">Pilih hari</h2>
-      <BorderedBox className="mt-2">
-        <BoxSection>
-          <p className="text-lg">Hari ini, Selasa 3 Nov</p>
-          <p className="text-muted">12 antrean tersisa</p>
-        </BoxSection>
-        <BoxSection selected>
-          <p className="text-lg">Rabu, 4 Nov</p>
-          <p className="text-muted">8 antrean tersisa</p>
-        </BoxSection>
-      </BorderedBox>
+      {info.emergencyNotice ? (
+        <p className="mt-6 rounded-box bg-noshow-bg px-[18px] py-3 text-sm text-noshow-fg">
+          {info.emergencyNotice}
+        </p>
+      ) : null}
+    </>
+  );
+}
 
-      <BorderedBox className="mt-4">
-        <UnderlineInput label="Nama pasien (wajib)" name="name" placeholder="Budi Santoso" />
-        <UnderlineInput
-          label="Nomor WhatsApp (wajib)"
-          name="whatsapp"
-          inputMode="tel"
-          placeholder="0812 0000 0000"
-        />
-        <UnderlineInput label="Keluhan (opsional)" name="complaint" placeholder="Telinga kanan berdenging" />
-      </BorderedBox>
-
-      <h2 className="mt-12 text-sm tracking-wide text-muted uppercase">Nomor antrean</h2>
-      <BorderedBox className="mt-2 text-center">
-        <BoxSection label="Nomor antrean" className="py-6">
-          <p className="text-8xl leading-none font-semibold text-accent">13</p>
-          <p className="mt-4 text-lg font-medium">Rabu, 4 Nov 2026</p>
-          <p className="text-muted">Perkiraan dipanggil sekitar pukul 20.30</p>
-        </BoxSection>
-      </BorderedBox>
-
-      <h2 className="mt-12 text-sm tracking-wide text-muted uppercase">Penanda status</h2>
-      <div className="mt-2 flex flex-wrap gap-2">
-        {QUEUE_STATUSES.map((status) => (
-          <StatusBadge key={status} status={status} />
-        ))}
-      </div>
-
-      <h2 className="mt-12 text-sm tracking-wide text-muted uppercase">Tombol</h2>
-      <div className="mt-2 space-y-3">
-        <Button>Ambil nomor antrean</Button>
-        <Button variant="outline">Kembali ke nomor saya</Button>
-        <div className="flex gap-2">
-          <Button size="sm">Panggil</Button>
-          <Button size="sm" variant="soft">
-            Selesai
-          </Button>
-          <Button size="sm" variant="soft">
-            Ekspor rekap CSV
-          </Button>
-        </div>
-      </div>
-
-      <p className="mt-6 text-center text-sm text-muted">
-        Nomor antrean per hari. Jam pemeriksaan berupa perkiraan.
-      </p>
-    </main>
+function PracticeSkeleton() {
+  return (
+    <div aria-busy="true" aria-label="Memuat info praktik" className="mt-12 animate-pulse">
+      <div className="h-5 w-48 rounded bg-line" />
+      <div className="mt-4 h-10 w-full rounded bg-line" />
+      <div className="mt-2 h-10 w-40 rounded bg-line" />
+      <div className="mt-8 h-48 rounded-box bg-line" />
+    </div>
   );
 }
