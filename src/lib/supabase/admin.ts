@@ -1,5 +1,6 @@
 import "server-only";
 import { createClient } from "@supabase/supabase-js";
+import type { Database } from "./database.types";
 import { publicEnv } from "@/lib/env";
 import { serviceRoleKey } from "@/lib/env.server";
 
@@ -9,7 +10,7 @@ import { serviceRoleKey } from "@/lib/env.server";
  * dan untuk aksi staf setelah peran diperiksa di server.
  */
 export function createAdminClient() {
-  return createClient(publicEnv().NEXT_PUBLIC_SUPABASE_URL, serviceRoleKey(), {
+  return createClient<Database>(publicEnv().NEXT_PUBLIC_SUPABASE_URL, serviceRoleKey(), {
     auth: {
       persistSession: false,
       autoRefreshToken: false,
