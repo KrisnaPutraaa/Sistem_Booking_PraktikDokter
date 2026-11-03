@@ -181,5 +181,21 @@ describe("fungsi pasien", () => {
     const { data } = await admin.rpc("get_now_serving", { p_date: concurrencyDate });
     expect(data).toBe(2);
   });
+
+  it("get_next_waiting hanya memberi nomor yang menunggu pada tanggal token; token salah = kosong", async () => {
+    // Lanjutan uji sebelumnya: nomor 2 sedang diperiksa, 1 dan 3-5 menunggu.
+    const entry = await admin
+      .from("queue_entries")
+      .select("public_token")
+      .eq("queue_date", concurrencyDate)
+      .eq("number", 5)
+      .single();
+    const { data, error } = await admin.rpc("get_next_waiting", { p_token: entry.data?.public_token ?? "" });
+    expect(error).toBeNull();
+    expect(data).toEqual([{ out_number: 1 }, { out_number: 3 }, { out_number: 4 }]);
+
+    const missing = await admin.rpc("get_next_waiting", { p_token: "bukan-token" });
+    expect(missing.data).toEqual([]);
+  });
 });
 
