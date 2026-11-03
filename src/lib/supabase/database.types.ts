@@ -238,6 +238,12 @@ export type Database = {
           out_waiting_ahead: number
         }[]
       }
+      get_next_waiting: {
+        Args: { p_limit?: number; p_token: string }
+        Returns: {
+          out_number: number
+        }[]
+      }
       get_now_serving: { Args: { p_date?: string }; Returns: number }
       take_queue: {
         Args: {

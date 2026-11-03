@@ -41,6 +41,7 @@ describe("anon (publik)", () => {
     expect((await anon.rpc("get_availability")).error?.code).toBe(PERMISSION_DENIED);
     expect((await anon.rpc("get_my_queue", { p_token: "x" })).error?.code).toBe(PERMISSION_DENIED);
     expect((await anon.rpc("get_now_serving", {})).error?.code).toBe(PERMISSION_DENIED);
+    expect((await anon.rpc("get_next_waiting", { p_token: "x" })).error?.code).toBe(PERMISSION_DENIED);
   });
 
   it("boleh membaca pengaturan dan hari libur, tetapi tidak mengubahnya", async () => {
