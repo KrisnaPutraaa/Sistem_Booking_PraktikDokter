@@ -41,5 +41,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# Supabase CLI (berisi ref project hasil supabase link)
+/supabase/.temp/
+/supabase/.branches/
+
 # Claude Code (konfigurasi lokal)
 .claude/

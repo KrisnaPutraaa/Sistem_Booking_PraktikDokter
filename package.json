@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:db": "vitest run --config vitest.db.config.mts",
+    "db:types": "npx supabase gen types typescript --remote --schema public > src/lib/supabase/database.types.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
