@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+/* Token desain dari Figma (docs/Panduan, bagian 4). Desain hanya mode terang. */
+@theme {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  --color-ink: #10252d;
+  --color-muted: #6b7d83;
+  --color-page: #fafbfb;
+  --color-line: #e4eaec;
+  --color-box-line: #d3dde0;
+  --color-primary: #008080;
+  --color-accent: #0b7a83;
+  --color-tint: #edf5f5;
+  --color-soft: #ddeef0;
+  --color-staff-bg: #f3f7f8;
+  --color-staff-line: #d5e1e4;
+
+  /* Penanda status, diambil dari layar Panel antrean */
+  --color-waiting-bg: #fdf1dc;
+  --color-waiting-fg: #9a5b00;
+  --color-progress-bg: #ddeef0;
+  --color-progress-fg: #0b7a83;
+  --color-done-bg: #e2f2e8;
+  --color-done-fg: #1e7a4a;
+  --color-noshow-bg: #fbe3e3;
+  --color-noshow-fg: #b4232c;
+
+  --radius-box: 16px;
+}
+
+body {
+  background: var(--color-page);
+  color: var(--color-ink);
+}
