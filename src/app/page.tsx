@@ -26,7 +26,7 @@ export default function Home() {
         <BoxSection label="Jam praktik">
           <div className="flex justify-between">
             <span>Senin – Sabtu</span>
-            <span>17.30 – 23.00</span>
+            <span>18.30 – 23.00</span>
           </div>
           <div className="mt-1 flex justify-between text-muted">
             <span>Minggu</span>

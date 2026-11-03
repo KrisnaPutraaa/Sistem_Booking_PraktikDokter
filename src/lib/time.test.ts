@@ -20,7 +20,7 @@ describe("waktu aplikasi (WITA)", () => {
     expect(timeInAppZone(now)).toBe("23:59");
   });
 
-  it("jam buka praktik 17.30 WITA = 09.30 UTC", () => {
-    expect(timeInAppZone(new Date("2026-11-03T09:30:00Z"))).toBe("17:30");
+  it("jam buka praktik 18.30 WITA = 10.30 UTC", () => {
+    expect(timeInAppZone(new Date("2026-11-03T10:30:00Z"))).toBe("18:30");
   });
 });
