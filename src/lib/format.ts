@@ -98,3 +98,8 @@ export function registrationInfo(opts: {
       : "Pendaftaran hanya untuk hari ini.";
   return { hours, range };
 }
+
+/** 150000 menjadi "Rp150.000" (tanpa desimal). */
+export function formatRupiah(value: number): string {
+  return `Rp${new Intl.NumberFormat("id-ID", { maximumFractionDigits: 0 }).format(value)}`;
+}

@@ -16,3 +16,9 @@ export function normalizeWhatsapp(input: string): string | null {
   const normalized = digits.startsWith("0") ? `62${digits.slice(1)}` : digits;
   return NORMALIZED.test(normalized) ? normalized : null;
 }
+
+/** Nomor ternormalisasi (628xx) untuk dibaca staf: "0812 3456 7890". */
+export function formatWhatsappDisplay(normalized: string): string {
+  const local = normalized.startsWith("62") ? `0${normalized.slice(2)}` : normalized;
+  return local.replace(/(\d{4})(?=\d)/g, "$1 ");
+}
