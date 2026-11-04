@@ -15,7 +15,7 @@ import {
   walkInSchema,
   type WalkInField,
 } from "@/lib/staff/schemas";
-import { currentStaff } from "@/lib/staff/session";
+import { currentStaff, lookupStaff } from "@/lib/staff/session";
 import { todayInAppZone } from "@/lib/time";
 
 /**
@@ -31,8 +31,9 @@ const SESSION_EXPIRED_MESSAGE = "Sesi berakhir. Masuk ulang, ya.";
 const SESSION_EXPIRED: ActionResult = { ok: false, message: SESSION_EXPIRED_MESSAGE };
 
 export async function signOutAction(): Promise<void> {
-  const staff = await currentStaff();
-  if (staff) await staff.supabase.auth.signOut();
+  // Juga untuk sesi yang belum lolos verifikasi dua langkah (halaman /staf/mfa).
+  const result = await lookupStaff();
+  if (result.kind === "staff" || result.kind === "mfa") await result.staff.supabase.auth.signOut();
   redirect("/staf/masuk?info=keluar");
 }
 
