@@ -65,7 +65,7 @@ export function QueueBoard({
         <p className="mt-8 text-muted">Belum ada antrean hari ini.</p>
       ) : (
         <div className="mt-4 overflow-x-auto">
-          <table className="w-full min-w-[860px] text-left">
+          <table className="w-full min-w-[720px] text-left">
             <thead>
               <tr className="border-b border-staff-line text-sm tracking-wider text-muted uppercase">
                 <th className="py-3 pr-4 font-normal">No</th>
@@ -132,10 +132,10 @@ function QueueRow({
       <td className="py-4 pr-4 text-2xl font-semibold">{entry.number}</td>
       <td className="py-4 pr-4">
         <p>{entry.name}</p>
-        <p className="text-muted">{formatWhatsappDisplay(entry.whatsapp)}</p>
+        <p className="whitespace-nowrap text-muted">{formatWhatsappDisplay(entry.whatsapp)}</p>
         {entry.source === "walk_in" ? <p className="mt-1 text-xs text-accent uppercase">walk-in</p> : null}
       </td>
-      <td className="max-w-[260px] py-4 pr-4 break-words">
+      <td className="max-w-[200px] py-4 pr-4 break-words">
         {entry.complaint ?? <span className="text-muted">(tidak mengisi keluhan)</span>}
       </td>
       {showFee ? (
@@ -153,7 +153,7 @@ function QueueRow({
           <p className="mt-1 text-xs text-muted">dipanggil {entry.callCount}×</p>
         ) : null}
       </td>
-      <td className="py-4">
+      <td className="w-[200px] py-4">
         <div className="flex flex-wrap gap-2">
           {entry.status === "waiting" ? (
             <Button size="sm" disabled={pending} onClick={() => run("call")}>
@@ -232,7 +232,7 @@ function FeeInput({
   }
 
   return (
-    <div className="w-36">
+    <div className="w-44">
       <label htmlFor={`fee-${entryId}`} className="sr-only">
         Masukkan tarif pasien nomor {number}
       </label>
@@ -254,7 +254,7 @@ function FeeInput({
             if (e.key === "Enter") e.currentTarget.blur();
             if (e.key === "Escape") setDraft(null);
           }}
-          className="w-full min-w-0 bg-transparent px-1 text-sm outline-none placeholder:text-xs"
+          className="w-full min-w-0 bg-transparent px-1 text-sm outline-none placeholder:text-[11px]"
         />
       </div>
       <p className="mt-1 h-4 text-xs text-muted" aria-live="polite">

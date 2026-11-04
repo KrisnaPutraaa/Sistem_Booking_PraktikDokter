@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import { Suspense } from "react";
 import { StaffBrand } from "@/components/staff/brand";
 import { AutoRefresh } from "@/components/staff/auto-refresh";
@@ -22,6 +23,7 @@ export default function StafPage() {
 }
 
 async function Panel() {
+  await connection();
   const staff = await requireStaff();
   const today = todayInAppZone();
   const settings = await getPanelSettings(staff);
