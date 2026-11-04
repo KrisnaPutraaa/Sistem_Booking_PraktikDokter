@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { QueueStatus } from "@/lib/queue-status";
 import { normalizeWhatsapp } from "@/lib/whatsapp";
 
 export const loginSchema = z.object({
@@ -23,9 +24,20 @@ export const STATUS_ACTIONS = {
   skip: "waiting", // belum datang, kembali menunggu
   no_show: "no_show",
   restore: "waiting", // tidak hadir disisipkan kembali
+  reopen: "in_progress", // selesai dikembalikan ke diperiksa (dokter dan pemilik)
 } as const;
 
 export type StatusAction = keyof typeof STATUS_ACTIONS;
+
+/** Status asal yang sah untuk setiap aksi (sama dengan transisi di trigger). */
+export const STATUS_ACTION_FROM = {
+  call: ["waiting", "in_progress"],
+  finish: ["in_progress"],
+  skip: ["in_progress"],
+  no_show: ["waiting", "in_progress"],
+  restore: ["no_show"],
+  reopen: ["done"],
+} as const satisfies Record<StatusAction, readonly QueueStatus[]>;
 
 export const statusActionSchema = z.object({
   entryId: z.uuid(),
@@ -60,13 +72,22 @@ export const feeSchema = z.object({
     }),
 });
 
+/** Nama pasien, sama dengan check tabel queue_entries (2–80 huruf). */
+export const patientNameSchema = z
+  .string({ error: "Nama pasien wajib diisi." })
+  .trim()
+  .min(1, { error: "Nama pasien wajib diisi." })
+  .min(2, { error: "Nama pasien minimal 2 huruf." })
+  .max(80, { error: "Nama pasien maksimal 80 huruf." });
+
+/** Koreksi nama oleh dokter atau pemilik. */
+export const nameCorrectionSchema = z.object({
+  entryId: z.uuid(),
+  name: patientNameSchema,
+});
+
 export const walkInSchema = z.object({
-  name: z
-    .string({ error: "Nama pasien wajib diisi." })
-    .trim()
-    .min(1, { error: "Nama pasien wajib diisi." })
-    .min(2, { error: "Nama pasien minimal 2 huruf." })
-    .max(80, { error: "Nama pasien maksimal 80 huruf." }),
+  name: patientNameSchema,
   whatsapp: z
     .string({ error: "Nomor WhatsApp wajib diisi." })
     .trim()
@@ -105,6 +126,10 @@ export const STAFF_ERROR_MESSAGES: Record<string, string> = {
   FULL: "Kuota hari ini sudah penuh.",
   TOO_MANY_FOR_NUMBER: "Nomor WhatsApp ini sudah mencapai batas antrean hari ini.",
   ACTOR_REQUIRED: "Akun staf tidak dikenali. Masuk ulang, ya.",
+  NAME_NOT_ALLOWED: "Hanya dokter dan pemilik yang bisa mengoreksi nama.",
+  NAME_WITH_OTHER_CHANGE: "Simpan koreksi nama terpisah dari perubahan lain.",
+  REVERT_NOT_ALLOWED: "Hanya dokter dan pemilik yang bisa mengembalikan status selesai.",
+  RANGE_INVALID: "Periode tidak valid (paling panjang 92 hari).",
 };
 
 export const STAFF_GENERIC_ERROR = "Terjadi gangguan. Coba lagi sebentar lagi.";

@@ -1,18 +1,16 @@
 import { connection } from "next/server";
 import { Suspense } from "react";
-import { StaffBrand } from "@/components/staff/brand";
 import { AutoRefresh } from "@/components/staff/auto-refresh";
 import { QueueBoard } from "@/components/staff/queue-board";
 import { SettingsCard } from "@/components/staff/settings-card";
+import { StaffHeader, StaffTabs } from "@/components/staff/staff-header";
 import { SummaryCards } from "@/components/staff/summary-cards";
 import { WalkInCard } from "@/components/staff/walk-in-card";
-import { Button } from "@/components/ui/button";
 import { formatLongDate } from "@/lib/format";
 import { getPanelEntries, getPanelSettings, summarize } from "@/lib/staff/data";
-import { canAddWalkIn, canManageFee, canSeeSettings, ROLE_LABEL } from "@/lib/staff/roles";
+import { canAddWalkIn, canManageFee, canSeeSettings } from "@/lib/staff/roles";
 import { requireStaff } from "@/lib/staff/session";
 import { todayInAppZone } from "@/lib/time";
-import { signOutAction } from "./actions";
 
 export default function StafPage() {
   return (
@@ -32,19 +30,7 @@ async function Panel() {
   return (
     <main className="mx-auto w-full max-w-[1330px] px-4 py-6 sm:px-6">
       <AutoRefresh intervalMs={10_000} />
-      <header className="flex flex-wrap items-center justify-between gap-4">
-        <StaffBrand label="Praktik THT, panel admin" />
-        <div className="flex items-center gap-3">
-          <p className="text-sm text-muted">
-            Masuk sebagai {ROLE_LABEL[staff.role]} · {staff.fullName}
-          </p>
-          <form action={signOutAction}>
-            <Button type="submit" variant="soft" size="sm">
-              Keluar
-            </Button>
-          </form>
-        </div>
-      </header>
+      <StaffHeader staff={staff} />
 
       <SummaryCards summary={summarize(entries)} />
 
@@ -55,6 +41,7 @@ async function Panel() {
           maxCalls={settings.maxCalls}
           practice={{ clinicName: settings.clinicName, doctorName: settings.doctorName }}
           showFee={canManageFee(staff.role)}
+          tabs={<StaffTabs role={staff.role} active="today" />}
         />
         <div className="grid gap-6">
           {canAddWalkIn(staff.role) ? <WalkInCard enabled={settings.walkInEnabled} /> : null}

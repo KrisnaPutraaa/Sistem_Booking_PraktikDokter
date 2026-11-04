@@ -71,10 +71,14 @@ describe("perawat", () => {
 
   it("tidak bisa mengubah kolom name, called_at, atau call_count", async () => {
     const nurse = ctx.staff.nurse.client;
-    for (const patch of [{ name: "Ganti Nama" }, { called_at: new Date().toISOString() }, { call_count: 9 }]) {
+    for (const patch of [{ called_at: new Date().toISOString() }, { call_count: 9 }]) {
       const { error } = await nurse.from("queue_entries").update(patch).eq("id", entryId);
       expect(error?.code, Object.keys(patch)[0]).toBe(PERMISSION_DENIED);
     }
+    // Sejak Fase 5 kolom name punya hak update (koreksi oleh dokter dan owner);
+    // perawat ditolak trigger queue_entries_status_guard.
+    const rename = await nurse.from("queue_entries").update({ name: "Ganti Nama" }).eq("id", entryId);
+    expect(rename.error?.message).toBe("NAME_NOT_ALLOWED");
     const row = await admin.from("queue_entries").select("name, call_count").eq("id", entryId).single();
     expect(row.data).toEqual({ name: "Pasien Akses", call_count: 1 });
   });

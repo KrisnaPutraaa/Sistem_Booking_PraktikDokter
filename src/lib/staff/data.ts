@@ -33,14 +33,16 @@ export type PanelSettings = {
   registrationCloseTime: string | null;
   daysAhead: number;
   maxCalls: number;
+  maxPerWhatsapp: number;
   walkInEnabled: boolean;
+  emergencyNotice: string | null;
 };
 
 export async function getPanelSettings(staff: StaffSession): Promise<PanelSettings> {
   const { data, error } = await staff.supabase
     .from("practice_settings")
     .select(
-      "doctor_name, clinic_name, daily_quota, avg_minutes, open_time, close_time, open_days, registration_open_time, cutoff_time, days_ahead, max_calls, walk_in_enabled",
+      "doctor_name, clinic_name, daily_quota, avg_minutes, open_time, close_time, open_days, registration_open_time, cutoff_time, days_ahead, max_calls, max_per_whatsapp, walk_in_enabled, emergency_notice",
     )
     .eq("id", 1)
     .single();
@@ -57,7 +59,9 @@ export async function getPanelSettings(staff: StaffSession): Promise<PanelSettin
     registrationCloseTime: data.cutoff_time,
     daysAhead: data.days_ahead,
     maxCalls: data.max_calls,
+    maxPerWhatsapp: data.max_per_whatsapp,
     walkInEnabled: data.walk_in_enabled,
+    emergencyNotice: data.emergency_notice,
   };
 }
 

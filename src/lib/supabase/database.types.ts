@@ -233,6 +233,19 @@ export type Database = {
           out_status: string
         }[]
       }
+      get_daily_recap: {
+        Args: { p_from: string; p_to: string }
+        Returns: {
+          out_avg_minutes: number
+          out_date: string
+          out_done: number
+          out_no_show: number
+          out_open: number
+          out_timed: number
+          out_total: number
+          out_total_fee: number
+        }[]
+      }
       get_my_queue: {
         Args: { p_token: string }
         Returns: {
