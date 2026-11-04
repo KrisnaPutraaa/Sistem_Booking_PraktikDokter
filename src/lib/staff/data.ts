@@ -12,7 +12,8 @@ export type PanelEntry = {
   id: string;
   number: number;
   name: string;
-  whatsapp: string;
+  /** Null bila data pasien sudah dianonimkan (dihapus atas permintaan). */
+  whatsapp: string | null;
   complaint: string | null;
   status: QueueStatus;
   source: "online" | "walk_in";
@@ -36,13 +37,15 @@ export type PanelSettings = {
   maxPerWhatsapp: number;
   walkInEnabled: boolean;
   emergencyNotice: string | null;
+  practiceWhatsapp: string | null;
+  anonymizeAfterMonths: number | null;
 };
 
 export async function getPanelSettings(staff: StaffSession): Promise<PanelSettings> {
   const { data, error } = await staff.supabase
     .from("practice_settings")
     .select(
-      "doctor_name, clinic_name, daily_quota, avg_minutes, open_time, close_time, open_days, registration_open_time, cutoff_time, days_ahead, max_calls, max_per_whatsapp, walk_in_enabled, emergency_notice",
+      "doctor_name, clinic_name, daily_quota, avg_minutes, open_time, close_time, open_days, registration_open_time, cutoff_time, days_ahead, max_calls, max_per_whatsapp, walk_in_enabled, emergency_notice, whatsapp, anonymize_after_months",
     )
     .eq("id", 1)
     .single();
@@ -62,6 +65,8 @@ export async function getPanelSettings(staff: StaffSession): Promise<PanelSettin
     maxPerWhatsapp: data.max_per_whatsapp,
     walkInEnabled: data.walk_in_enabled,
     emergencyNotice: data.emergency_notice,
+    practiceWhatsapp: data.whatsapp,
+    anonymizeAfterMonths: data.anonymize_after_months,
   };
 }
 

@@ -1,6 +1,8 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { RATE_LIMITED_MESSAGE, RATE_LIMITS } from "@/lib/rate-limit";
+import { allowAttempt, requestIpKey } from "@/lib/rate-limit.server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { verifyTurnstile } from "@/lib/turnstile.server";
 import {
@@ -21,8 +23,8 @@ function field(formData: FormData, name: string): string | undefined {
 }
 
 /**
- * Ambil nomor antrean (pasien online). Urutan: validasi zod, verifikasi
- * Turnstile, lalu take_queue lewat service_role. Log hanya berisi kode galat,
+ * Ambil nomor antrean (pasien online). Urutan: validasi zod, batas percobaan
+ * per IP, verifikasi Turnstile, lalu take_queue lewat service_role. Log hanya berisi kode galat,
  * tidak pernah nama, WhatsApp, atau keluhan.
  */
 export async function takeQueueAction(_prev: TakeQueueState, formData: FormData): Promise<TakeQueueState> {
@@ -45,6 +47,10 @@ export async function takeQueueAction(_prev: TakeQueueState, formData: FormData)
   }
 
   const input = parsed.data;
+
+  if (!(await allowAttempt(RATE_LIMITS.takeQueueIp, await requestIpKey()))) {
+    return { status: "error", message: RATE_LIMITED_MESSAGE };
+  }
 
   if (!(await verifyTurnstile(input.turnstileToken))) {
     return {

@@ -5,6 +5,7 @@ import { saveSettingsAction, type SettingsState } from "@/app/staf/pengaturan/ac
 import { Button } from "@/components/ui/button";
 import type { PanelSettings } from "@/lib/staff/data";
 import { minutesOfDay, type SettingsField } from "@/lib/staff/settings-schema";
+import { formatWhatsappDisplay } from "@/lib/whatsapp";
 import { FieldError, StaffInput, StaffTextarea } from "./field";
 
 const DAYS = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"] as const;
@@ -194,6 +195,43 @@ export function SettingsForm({ settings }: { settings: PanelSettings }) {
             {...field("emergencyNotice")}
           />
         </Field>
+      </Section>
+
+      <Section title="Kontak dan privasi">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field
+            label="Nomor WhatsApp praktik"
+            hint="Tampil di halaman Kebijakan Privasi sebagai kontak permintaan hapus data."
+            name="practiceWhatsapp"
+            error={errors?.practiceWhatsapp}
+          >
+            <StaffInput
+              id="practiceWhatsapp"
+              name="practiceWhatsapp"
+              inputMode="tel"
+              placeholder="0812 3456 7890"
+              defaultValue={
+                sent?.practiceWhatsapp ?? (settings.practiceWhatsapp ? formatWhatsappDisplay(settings.practiceWhatsapp) : "")
+              }
+              {...field("practiceWhatsapp")}
+            />
+          </Field>
+          <Field
+            label="Anonimkan data pasien otomatis setelah (bulan)"
+            hint="Kosongkan = mati (data disimpan sampai diminta dihapus). Bila diisi, nama, WhatsApp, dan keluhan antrean yang lebih tua dihapus setiap malam."
+            name="anonymizeAfterMonths"
+            error={errors?.anonymizeAfterMonths}
+          >
+            <StaffInput
+              id="anonymizeAfterMonths"
+              name="anonymizeAfterMonths"
+              inputMode="numeric"
+              placeholder="Mati"
+              defaultValue={sent?.anonymizeAfterMonths ?? settings.anonymizeAfterMonths ?? ""}
+              {...field("anonymizeAfterMonths")}
+            />
+          </Field>
+        </div>
       </Section>
 
       <div>

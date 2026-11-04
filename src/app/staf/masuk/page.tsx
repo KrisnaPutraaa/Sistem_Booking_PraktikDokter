@@ -3,8 +3,10 @@ import { StaffBrand } from "@/components/staff/brand";
 import { LoginForm } from "./login-form";
 
 const NOTICES: Record<string, string> = {
-  peran: "Akun ini belum diberi peran staf. Hubungi pemilik praktik.",
+  peran: "Akun ini belum diberi peran staf atau sudah dinonaktifkan. Hubungi pemilik praktik.",
   keluar: "Anda sudah keluar.",
+  pemulihan: "Perangkat lama sudah dilepas. Masuk lagi, lalu pasang verifikasi dua langkah di ponsel baru.",
+  "mfa-mati": "Verifikasi dua langkah sudah dimatikan. Silakan masuk lagi.",
 };
 
 export default function MasukPage({ searchParams }: PageProps<"/staf/masuk">) {

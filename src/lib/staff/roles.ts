@@ -8,6 +8,23 @@ export const ROLE_LABEL: Record<StaffRole, string> = {
   owner: "Pemilik",
 };
 
+/**
+ * Verifikasi dua langkah (TOTP) wajib untuk dokter dan pemilik (keputusan
+ * Fase 6), opsional untuk perawat. Database menegakkan hal yang sama di
+ * current_app_role(): peran ini tanpa sesi aal2 tidak mendapat akses.
+ */
+export function mfaRequiredFor(role: StaffRole): boolean {
+  return role === "doctor" || role === "owner";
+}
+
+/** Hapus data pasien atas permintaan dan kelola akun staf: hanya pemilik. */
+export function isOwner(role: StaffRole): boolean {
+  return role === "owner";
+}
+
+export const canErasePatientData = isOwner;
+export const canManageStaff = isOwner;
+
 /** Pengaturan praktik hanya untuk dokter dan pemilik; perawat hanya mengelola antrean. */
 export function canSeeSettings(role: StaffRole): boolean {
   return role === "doctor" || role === "owner";

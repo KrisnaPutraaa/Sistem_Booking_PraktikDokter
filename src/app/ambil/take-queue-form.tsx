@@ -188,9 +188,19 @@ export function TakeQueueForm({
             onChange={(e) => setConsent(e.target.checked)}
             className="mt-0.5 size-5 shrink-0 accent-primary"
           />
+          {/* DRAF teks persetujuan (Fase 6): menunggu tinjauan dokter dan pihak yang paham UU PDP. */}
           <span>
-            Saya setuju nama, nomor WhatsApp, dan keluhan ini dipakai praktik untuk mengatur antrean dan
-            menghubungi saya.
+            Saya setuju nama, nomor WhatsApp, dan keluhan ini (keluhan termasuk informasi kesehatan) dipakai praktik
+            untuk mengatur antrean dan menghubungi saya, sesuai{" "}
+            <a
+              href="/kebijakan-privasi"
+              target="_blank"
+              rel="noopener"
+              className="text-accent underline underline-offset-2"
+            >
+              Kebijakan Privasi
+            </a>
+            .
           </span>
         </label>
         {errors.consent ? <p className="mt-1 text-sm text-noshow-fg">{errors.consent}</p> : null}

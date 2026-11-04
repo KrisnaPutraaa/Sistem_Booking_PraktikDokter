@@ -58,6 +58,8 @@ export async function saveSettingsAction(_prev: SettingsState, formData: FormDat
     maxPerWhatsapp: text("maxPerWhatsapp"),
     walkInEnabled: text("walkInEnabled"),
     emergencyNotice: text("emergencyNotice"),
+    practiceWhatsapp: text("practiceWhatsapp"),
+    anonymizeAfterMonths: text("anonymizeAfterMonths"),
   };
   const parsed = settingsSchema.safeParse(values);
   if (!parsed.success) {
@@ -84,6 +86,8 @@ export async function saveSettingsAction(_prev: SettingsState, formData: FormDat
       max_per_whatsapp: s.maxPerWhatsapp,
       walk_in_enabled: s.walkInEnabled,
       emergency_notice: s.emergencyNotice,
+      whatsapp: s.practiceWhatsapp,
+      anonymize_after_months: s.anonymizeAfterMonths,
     })
     .eq("id", 1)
     .select("id");

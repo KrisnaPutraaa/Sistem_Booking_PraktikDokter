@@ -1,0 +1,30 @@
+# Pembaruan dependensi otomatis (Fase 6). Dependabot membuka pull request;
+# tidak ada yang di-merge otomatis. Tinjau changelog, pastikan CI hijau, lalu merge.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "08:00"
+      timezone: Asia/Makassar
+    open-pull-requests-limit: 5
+    groups:
+      # Patch dan minor digabung per minggu supaya tidak banjir PR.
+      npm-minor-patch:
+        update-types: [minor, patch]
+    # Versi mayor dibuka sebagai PR terpisah dan perlu ditinjau manual
+    # (panduan bagian 3.1: jangan ganti versi mayor tanpa alasan).
+    labels: [dependencies]
+    commit-message:
+      prefix: "deps"
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+      timezone: Asia/Makassar
+    labels: [dependencies]
+    commit-message:
+      prefix: "ci"

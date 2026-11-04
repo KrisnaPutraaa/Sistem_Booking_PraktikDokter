@@ -67,3 +67,28 @@ Temuan saat Fase 1. Dicatat saja, belum diperbaiki (keputusan pemilik proyek).
   yang ada tidak dibatalkan otomatis. Perlu keputusan bila ingin pembatalan dan pesan WhatsApp massal.
 - Filter "Semua status" dari desain Riwayat dipasang di kartu detail pasien per tanggal (filter ini
   tidak bermakna untuk tabel rekap per hari).
+
+## Dari Fase 6 untuk Fase 7 ke atas
+
+- **Migrasi `20261106000001_fase6.sql`** sudah di-push ke `praktik-tht-dev` saja. Produksi perlu `supabase db push`
+  sendiri. Migrasi ini memasang `pgcrypto` (schema `extensions`) dan `pg_cron`, membuat schema `private`, serta
+  menjadwalkan `praktik-pemeliharaan-harian` (03.00 WITA).
+- **Akun dokter dan owner yang sudah ada** (termasuk akun dev Krizzz dan dr. Dhena) wajib memasang verifikasi dua
+  langkah saat masuk berikutnya. Sebelum itu, database menolak akses mereka (aal1 = tanpa peran).
+- **Teks privasi masih DRAF**: `src/app/kebijakan-privasi/page.tsx` (ada kotak "Draf" yang tampil ke pasien) dan
+  teks centang di `src/app/ambil/take-queue-form.tsx`. Hal yang perlu ditinjau dokter dan pihak yang paham UU PDP:
+  dasar pemrosesan dan bentuk persetujuan untuk data kesehatan (keluhan); transfer data ke luar negeri (Supabase
+  Singapura, Vercel); masa simpan cadangan Supabase (isi angka pastinya); kanal permintaan hapus; kewajiban
+  notifikasi kebocoran di `docs/rencana-insiden-kebocoran-data.md`. Setelah disetujui: ubah `DRAFT_UPDATED`, hapus
+  kotak Draf dan komentar DRAF.
+- **Nomor WhatsApp praktik** belum diisi. Isi di Pengaturan, Kontak dan privasi, supaya tampil di Kebijakan Privasi.
+- **Setelan Supabase Auth** (dev dan produksi): kata sandi minimal 12, TOTP aktif, pendaftaran publik mati, leaked
+  password protection bila tersedia. Daftar periksa di `docs/kebijakan-akun-staf.md`.
+- **GitHub**: aktifkan secret scanning. Setelah merge, Dependabot dan workflow CI berjalan. Pertimbangkan menjadikan
+  CI sebagai *required check* di branch protection `main`.
+- **Vercel Firewall**: opsional. Bila paket mendukung, tambahkan aturan rate limit untuk POST `/ambil` dan
+  `/staf/masuk` sebagai lapisan di depan batas database.
+- **Next 16 menyimpan state halaman** yang pernah dibuka (juga setelah keluar dan masuk). Data yang hanya boleh tampil
+  sekali (kode pemulihan) atau data pasien hasil pencarian dibuang dengan `useClearOnHide`. Pakai pola yang sama
+  untuk layar sensitif baru.
+- Batas percobaan dan pengaturan anonimkan otomatis: lihat `src/lib/rate-limit.ts` dan `docs/prosedur-hapus-data.md`.

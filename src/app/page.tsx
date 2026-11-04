@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Suspense } from "react";
 import { BorderedBox, BoxSection } from "@/components/ui/bordered-box";
 import { Brand, LinkButton, PatientPage } from "@/components/patient/page-shell";
@@ -16,6 +17,11 @@ export default function Home() {
           <SavedQueueLink />
           <p className="mt-4 text-center text-sm text-muted">
             Nomor antrean per hari. Jam pemeriksaan berupa perkiraan.
+          </p>
+          <p className="mt-2 text-center text-sm">
+            <Link href="/kebijakan-privasi" className="text-muted underline underline-offset-2">
+              Kebijakan Privasi
+            </Link>
           </p>
         </>
       }

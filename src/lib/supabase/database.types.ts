@@ -77,6 +77,7 @@ export type Database = {
       practice_settings: {
         Row: {
           address: string | null
+          anonymize_after_months: number | null
           avg_minutes: number
           clinic_name: string | null
           close_time: string
@@ -98,6 +99,7 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          anonymize_after_months?: number | null
           avg_minutes?: number
           clinic_name?: string | null
           close_time?: string
@@ -119,6 +121,7 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          anonymize_after_months?: number | null
           avg_minutes?: number
           clinic_name?: string | null
           close_time?: string
@@ -143,18 +146,21 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string
+          disabled_at: string | null
           full_name: string
           id: string
           role: Database["public"]["Enums"]["app_role"]
         }
         Insert: {
           created_at?: string
+          disabled_at?: string | null
           full_name: string
           id: string
           role: Database["public"]["Enums"]["app_role"]
         }
         Update: {
           created_at?: string
+          disabled_at?: string | null
           full_name?: string
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
@@ -163,6 +169,7 @@ export type Database = {
       }
       queue_entries: {
         Row: {
+          anonymized_at: string | null
           call_count: number
           called_at: string | null
           complaint: string | null
@@ -177,9 +184,10 @@ export type Database = {
           queue_date: string
           source: string
           status: Database["public"]["Enums"]["queue_status"]
-          whatsapp: string
+          whatsapp: string | null
         }
         Insert: {
+          anonymized_at?: string | null
           call_count?: number
           called_at?: string | null
           complaint?: string | null
@@ -194,9 +202,10 @@ export type Database = {
           queue_date: string
           source?: string
           status?: Database["public"]["Enums"]["queue_status"]
-          whatsapp: string
+          whatsapp?: string | null
         }
         Update: {
+          anonymized_at?: string | null
           call_count?: number
           called_at?: string | null
           complaint?: string | null
@@ -211,7 +220,7 @@ export type Database = {
           queue_date?: string
           source?: string
           status?: Database["public"]["Enums"]["queue_status"]
-          whatsapp?: string
+          whatsapp?: string | null
         }
         Relationships: []
       }
@@ -220,10 +229,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      anonymize_expired: { Args: never; Returns: number }
+      consume_recovery_code: {
+        Args: { p_code: string; p_user: string }
+        Returns: boolean
+      }
       current_app_role: {
         Args: never
         Returns: Database["public"]["Enums"]["app_role"]
       }
+      delete_recovery_codes: { Args: { p_user: string }; Returns: undefined }
+      erase_queue_entries: { Args: { p_ids: string[] }; Returns: number }
       get_availability: {
         Args: never
         Returns: {
@@ -264,6 +280,25 @@ export type Database = {
         }[]
       }
       get_now_serving: { Args: { p_date?: string }; Returns: number }
+      hit_rate_limit: {
+        Args: {
+          p_bucket: string
+          p_key: string
+          p_max: number
+          p_window_seconds: number
+        }
+        Returns: boolean
+      }
+      log_staff_event: {
+        Args: { p_action: string; p_actor: string; p_data?: Json }
+        Returns: undefined
+      }
+      recovery_codes_remaining: { Args: { p_user: string }; Returns: number }
+      replace_recovery_codes: {
+        Args: { p_codes: string[]; p_user: string }
+        Returns: number
+      }
+      run_daily_maintenance: { Args: never; Returns: undefined }
       take_queue: {
         Args: {
           p_actor?: string

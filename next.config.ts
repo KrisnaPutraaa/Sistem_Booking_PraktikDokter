@@ -1,7 +1,37 @@
 import type { NextConfig } from "next";
 
-// CSP sengaja ditunda ke Fase 6 (perlu mengizinkan Turnstile dan script Next).
+const isDev = process.env.NODE_ENV !== "production";
+const TURNSTILE = "https://challenges.cloudflare.com";
+
+/**
+ * CSP (Fase 6). Tanpa nonce, supaya halaman publik tetap bisa dirender statis
+ * (nonce memaksa setiap halaman dinamis). Akibatnya script inline Next masih
+ * perlu 'unsafe-inline'; sumber script lain dibatasi ke situs ini dan
+ * Turnstile. Browser tidak memakai klien Supabase (pasien lewat Server Action,
+ * staf lewat cookie di server), jadi connect-src cukup 'self'.
+ * Dev: React butuh 'unsafe-eval' dan HMR memakai websocket.
+ */
+const csp = [
+  "default-src 'self'",
+  `script-src 'self' 'unsafe-inline' ${TURNSTILE}${isDev ? " 'unsafe-eval'" : ""}`,
+  "style-src 'self' 'unsafe-inline'",
+  // data: untuk kode QR verifikasi dua langkah (SVG dari Supabase).
+  "img-src 'self' data: blob:",
+  "font-src 'self'",
+  `connect-src 'self' ${TURNSTILE}${isDev ? " ws://localhost:* ws://127.0.0.1:*" : ""}`,
+  `frame-src ${TURNSTILE}`,
+  "frame-ancestors 'none'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "manifest-src 'self'",
+  "worker-src 'self' blob:",
+  ...(isDev ? [] : ["upgrade-insecure-requests"]),
+].join("; ");
+
 const securityHeaders = [
+  { key: "Content-Security-Policy", value: csp },
+  { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
   { key: "X-Frame-Options", value: "DENY" },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
