@@ -12,7 +12,8 @@ export type PanelEntry = {
   id: string;
   number: number;
   name: string;
-  whatsapp: string;
+  /** Null bila data pasien sudah dianonimkan (dihapus atas permintaan). */
+  whatsapp: string | null;
   complaint: string | null;
   status: QueueStatus;
   source: "online" | "walk_in";

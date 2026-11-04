@@ -2,6 +2,7 @@ import { randomBytes } from "node:crypto";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/database.types";
 import { todayInAppZone } from "@/lib/time";
+import { totp } from "./totp";
 
 /**
  * Perlengkapan uji database terhadap project dev. Nilai koneksi datang dari
@@ -73,7 +74,43 @@ async function createStaff(role: Role): Promise<Staff> {
   const client = createClient<Database>(url, anonKey, noSession);
   const signedIn = await client.auth.signInWithPassword({ email, password });
   if (signedIn.error) throw signedIn.error;
+
+  // Fase 6: owner dan dokter wajib aal2 di RLS (current_app_role).
+  if (role !== "nurse") await upgradeToAal2(client);
   return { id, client };
+}
+
+/** Pasang faktor TOTP lalu verifikasi, sehingga sesi klien menjadi aal2. */
+export async function upgradeToAal2(client: Db): Promise<{ factorId: string; secret: string }> {
+  const enrolled = await client.auth.mfa.enroll({ factorType: "totp", friendlyName: "uji" });
+  if (enrolled.error) throw enrolled.error;
+  const { id: factorId, totp: t } = enrolled.data;
+  const verified = await client.auth.mfa.challengeAndVerify({ factorId, code: totp(t.secret) });
+  if (verified.error) throw verified.error;
+  return { factorId, secret: t.secret };
+}
+
+/** Klien baru yang login dengan email dan kata sandi saja (aal1). */
+export async function signInAal1(email: string, password: string): Promise<Db> {
+  const client = createClient<Database>(url, anonKey, noSession);
+  const signedIn = await client.auth.signInWithPassword({ email, password });
+  if (signedIn.error) throw signedIn.error;
+  return client;
+}
+
+/** Akun uji tambahan (dibersihkan pemanggil dengan admin.auth.admin.deleteUser). */
+export async function createTestUser(role: Role) {
+  const email = `test-db-${role}-${randomBytes(6).toString("hex")}@example.com`;
+  const password = randomBytes(24).toString("base64url");
+  const created = await admin.auth.admin.createUser({ email, password, email_confirm: true });
+  if (created.error) throw created.error;
+  const id = created.data.user.id;
+  const profile = await admin.from("profiles").insert({ id, full_name: `Uji ${role}`, role });
+  if (profile.error) {
+    await admin.auth.admin.deleteUser(id);
+    throw profile.error;
+  }
+  return { id, email, password };
 }
 
 export async function setupDbTest(dateCount: number): Promise<DbTestContext> {

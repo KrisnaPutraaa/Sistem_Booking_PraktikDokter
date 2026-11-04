@@ -120,21 +120,25 @@ function QueueRow({
   }
 
   const canMarkNoShow = entry.callCount >= maxCalls;
-  const waLink = buildWhatsappLink({
-    whatsapp: entry.whatsapp,
-    number: entry.number,
-    status: entry.status,
-    estTime: entry.estTime,
-    clinicName: practice.clinicName,
-    doctorName: practice.doctorName,
-  });
+  const waLink = entry.whatsapp
+    ? buildWhatsappLink({
+        whatsapp: entry.whatsapp,
+        number: entry.number,
+        status: entry.status,
+        estTime: entry.estTime,
+        clinicName: practice.clinicName,
+        doctorName: practice.doctorName,
+      })
+    : null;
 
   return (
     <tr className={cn("border-b border-line align-top", pending && "opacity-60")}>
       <td className="py-4 pr-4 text-2xl font-semibold">{entry.number}</td>
       <td className="py-4 pr-4">
         <p>{entry.name}</p>
-        <p className="whitespace-nowrap text-muted">{formatWhatsappDisplay(entry.whatsapp)}</p>
+        <p className="whitespace-nowrap text-muted">
+          {entry.whatsapp ? formatWhatsappDisplay(entry.whatsapp) : "(data dihapus)"}
+        </p>
         {entry.source === "walk_in" ? <p className="mt-1 text-xs text-accent uppercase">walk-in</p> : null}
       </td>
       <td className="max-w-[200px] py-4 pr-4 break-words">
@@ -185,7 +189,7 @@ function QueueRow({
               Kembalikan ke antrean
             </Button>
           ) : null}
-          {entry.status !== "done" && entry.status !== "no_show" ? (
+          {waLink && entry.status !== "done" && entry.status !== "no_show" ? (
             <a
               href={waLink}
               target="_blank"
