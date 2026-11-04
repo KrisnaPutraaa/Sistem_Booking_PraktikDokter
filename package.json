@@ -10,7 +10,8 @@
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run",
     "test:db": "vitest run --config vitest.db.config.mts",
-    "db:types": "npx supabase gen types typescript --remote --schema public > src/lib/supabase/database.types.ts"
+    "db:types": "npx supabase gen types typescript --remote --schema public > src/lib/supabase/database.types.ts",
+    "check:bundle": "node scripts/check-client-bundle.mjs"
   },
   "dependencies": {
     "@marsidev/react-turnstile": "^1.6.3",

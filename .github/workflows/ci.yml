@@ -1,0 +1,38 @@
+# Pemeriksaan setiap pull request dan push ke main: lint, typecheck, uji unit,
+# build, dan pemeriksaan kunci rahasia di bundle klien (daftar periksa bagian 8).
+# Tanpa secret: uji database (npm run test:db) tetap dijalankan manual
+# terhadap project dev.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+      - run: npm run check:bundle
