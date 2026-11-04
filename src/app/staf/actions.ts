@@ -3,10 +3,12 @@
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { canAddWalkIn, canManageFee } from "@/lib/staff/roles";
+import { canAddWalkIn, canCorrectName, canManageFee, canReopenDone } from "@/lib/staff/roles";
 import {
   feeSchema,
+  nameCorrectionSchema,
   STAFF_GENERIC_ERROR,
+  STATUS_ACTION_FROM,
   STATUS_ACTIONS,
   staffErrorMessage,
   statusActionSchema,
@@ -40,15 +42,23 @@ export async function updateStatusAction(entryId: string, action: string): Promi
 
   const parsed = statusActionSchema.safeParse({ entryId, action });
   if (!parsed.success) return { ok: false, message: STAFF_GENERIC_ERROR };
+  if (parsed.data.action === "reopen" && !canReopenDone(staff.role)) {
+    return { ok: false, message: "Hanya dokter dan pemilik yang bisa mengembalikan status selesai." };
+  }
 
+  // Status asal dibatasi per aksi. Tanpa ini, "Panggil" pada pasien selesai
+  // akan diterima database sebagai "kembalikan" untuk dokter dan pemilik.
   const { data, error } = await staff.supabase
     .from("queue_entries")
     .update({ status: STATUS_ACTIONS[parsed.data.action] })
     .eq("id", parsed.data.entryId)
+    .in("status", [...STATUS_ACTION_FROM[parsed.data.action]])
     .select("id");
 
   if (error) return failure("ubah status", error);
-  if (!data || data.length === 0) return { ok: false, message: "Antrean tidak ditemukan." };
+  if (!data || data.length === 0) {
+    return { ok: false, message: "Status sudah berubah. Muat ulang panel lalu coba lagi." };
+  }
   refresh();
   return { ok: true };
 }
@@ -68,6 +78,29 @@ export async function setFeeAction(entryId: string, fee: string): Promise<Action
     .select("id");
 
   if (error) return failure("simpan tarif", error);
+  if (!data || data.length === 0) return { ok: false, message: "Antrean tidak ditemukan." };
+  refresh();
+  return { ok: true };
+}
+
+/** Koreksi nama pasien: dokter dan pemilik. Audit log mencatat name_changed tanpa nama. */
+export async function correctNameAction(entryId: string, name: string): Promise<ActionResult> {
+  const staff = await currentStaff();
+  if (!staff) return SESSION_EXPIRED;
+  if (!canCorrectName(staff.role)) {
+    return { ok: false, message: "Hanya dokter dan pemilik yang bisa mengoreksi nama." };
+  }
+
+  const parsed = nameCorrectionSchema.safeParse({ entryId, name });
+  if (!parsed.success) return { ok: false, message: parsed.error.issues[0]?.message ?? "Nama tidak valid." };
+
+  const { data, error } = await staff.supabase
+    .from("queue_entries")
+    .update({ name: parsed.data.name })
+    .eq("id", parsed.data.entryId)
+    .select("id");
+
+  if (error) return failure("koreksi nama", error);
   if (!data || data.length === 0) return { ok: false, message: "Antrean tidak ditemukan." };
   refresh();
   return { ok: true };

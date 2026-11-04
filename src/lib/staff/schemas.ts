@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { QueueStatus } from "@/lib/queue-status";
 import { normalizeWhatsapp } from "@/lib/whatsapp";
 
 export const loginSchema = z.object({
@@ -27,6 +28,16 @@ export const STATUS_ACTIONS = {
 } as const;
 
 export type StatusAction = keyof typeof STATUS_ACTIONS;
+
+/** Status asal yang sah untuk setiap aksi (sama dengan transisi di trigger). */
+export const STATUS_ACTION_FROM = {
+  call: ["waiting", "in_progress"],
+  finish: ["in_progress"],
+  skip: ["in_progress"],
+  no_show: ["waiting", "in_progress"],
+  restore: ["no_show"],
+  reopen: ["done"],
+} as const satisfies Record<StatusAction, readonly QueueStatus[]>;
 
 export const statusActionSchema = z.object({
   entryId: z.uuid(),

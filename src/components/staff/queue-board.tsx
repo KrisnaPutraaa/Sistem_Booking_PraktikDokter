@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { type ReactNode, useState, useTransition } from "react";
 import { setFeeAction, updateStatusAction } from "@/app/staf/actions";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -21,8 +21,10 @@ export function QueueBoard({
   maxCalls,
   practice,
   showFee,
+  tabs,
 }: {
   title: string;
+  tabs: ReactNode;
   entries: PanelEntry[];
   maxCalls: number;
   practice: Practice;
@@ -36,7 +38,7 @@ export function QueueBoard({
     <StaffCard className="min-w-0">
       <h1 className="text-2xl font-semibold sm:text-[28px]">{title}</h1>
       <div className="mt-4 flex flex-wrap items-center gap-3">
-        <span className="inline-flex h-10 items-center rounded-lg bg-primary px-4 text-white">Antrean hari ini</span>
+        {tabs}
         <label className="sr-only" htmlFor="status-filter">
           Saring status
         </label>

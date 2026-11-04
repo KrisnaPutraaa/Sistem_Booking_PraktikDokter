@@ -1,8 +1,9 @@
+import Link from "next/link";
 import { closedIsoDays, formatClock, formatDayGroups } from "@/lib/format";
 import type { PanelSettings } from "@/lib/staff/data";
 import { StaffCard } from "./card";
 
-/** Ringkasan pengaturan untuk dokter dan pemilik. Penyuntingan menyusul di Fase 5. */
+/** Ringkasan pengaturan untuk dokter dan pemilik. Penyuntingan di /staf/pengaturan. */
 export function SettingsCard({ settings }: { settings: PanelSettings }) {
   const closed = formatDayGroups(closedIsoDays(settings.openDays));
   const rows: [string, string][] = [
@@ -42,7 +43,12 @@ export function SettingsCard({ settings }: { settings: PanelSettings }) {
           <span>Tutup</span>
         </div>
       ) : null}
-      <p className="mt-5 text-sm text-muted">Pengubahan pengaturan tersedia di tahap berikutnya.</p>
+      <Link
+        href="/staf/pengaturan"
+        className="mt-5 inline-flex h-10 items-center rounded-lg bg-soft px-4 text-sm font-medium hover:bg-soft/70"
+      >
+        Ubah pengaturan
+      </Link>
     </StaffCard>
   );
 }
