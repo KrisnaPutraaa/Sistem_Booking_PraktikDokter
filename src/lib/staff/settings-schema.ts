@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { isCalendarDate } from "@/lib/time";
+import { normalizeWhatsapp } from "@/lib/whatsapp";
 
 /**
  * Validasi halaman Pengaturan. Batas angka dan urutan jam sama dengan constraint
@@ -63,6 +64,28 @@ export const settingsSchema = z
       .max(500, { error: "Pengumuman maksimal 500 karakter." })
       .optional()
       .transform((v) => v || null),
+    // Kontak praktik di halaman Kebijakan Privasi (permintaan hapus data). Kosong = tidak ditampilkan.
+    practiceWhatsapp: z
+      .string()
+      .trim()
+      .max(32, { error: "Nomor WhatsApp praktik tidak valid." })
+      .optional()
+      .transform((value, ctx) => {
+        if (!value) return null;
+        const normalized = normalizeWhatsapp(value);
+        if (!normalized) {
+          ctx.addIssue({ code: "custom", message: "Nomor WhatsApp praktik tidak valid. Contoh: 0812 3456 7890." });
+          return z.NEVER;
+        }
+        return normalized;
+      }),
+    // Anonimkan otomatis setelah N bulan. Kosong = mati (bawaan, keputusan dokter).
+    anonymizeAfterMonths: z
+      .string()
+      .trim()
+      .optional()
+      .transform((v) => v || null)
+      .pipe(intIn("Anonimkan setelah", 1, 120).nullable()),
   })
   .superRefine((s, ctx) => {
     const open = minutesOfDay(s.openTime);
@@ -139,6 +162,8 @@ export const SETTINGS_CONSTRAINT_MESSAGES: Record<string, string> = {
   registration_window_order: "Jam buka pendaftaran harus sebelum jam tutup pendaftaran.",
   registration_open_before_close: "Jam buka pendaftaran harus sebelum jam selesai praktik.",
   emergency_notice_length: "Pengumuman maksimal 500 karakter.",
+  practice_whatsapp_format: "Nomor WhatsApp praktik tidak valid.",
+  anonymize_after_months_range: "Anonimkan otomatis: isi 1 sampai 120 bulan, atau kosongkan.",
 };
 
 export function settingsConstraintMessage(message: string | undefined): string | null {

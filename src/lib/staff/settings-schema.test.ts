@@ -22,6 +22,21 @@ const issues = (input: SettingsInput) => {
 };
 
 describe("settingsSchema", () => {
+  it("WhatsApp praktik dan anonimkan otomatis: kosong = null, diisi dinormalkan dan dibatasi", () => {
+    const empty = settingsSchema.parse(valid);
+    expect(empty.practiceWhatsapp).toBeNull();
+    expect(empty.anonymizeAfterMonths).toBeNull();
+
+    const filled = settingsSchema.parse({ ...valid, practiceWhatsapp: "0812-3456-7890", anonymizeAfterMonths: "24" });
+    expect(filled.practiceWhatsapp).toBe("6281234567890");
+    expect(filled.anonymizeAfterMonths).toBe(24);
+
+    expect(issues({ ...valid, practiceWhatsapp: "12345" })).toEqual(["practiceWhatsapp"]);
+    expect(issues({ ...valid, anonymizeAfterMonths: "0" })).toEqual(["anonymizeAfterMonths"]);
+    expect(issues({ ...valid, anonymizeAfterMonths: "121" })).toEqual(["anonymizeAfterMonths"]);
+    expect(settingsConstraintMessage('violates check constraint "anonymize_after_months_range"')).toMatch(/120 bulan/);
+  });
+
   it("menerima nilai bawaan dan menormalkan", () => {
     const r = settingsSchema.parse({ ...valid, openTime: "18:30:00", openDays: ["3", "1", "1"] });
     expect(r).toMatchObject({

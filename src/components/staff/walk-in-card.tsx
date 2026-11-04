@@ -81,7 +81,13 @@ export function WalkInCard({ enabled }: { enabled: boolean }) {
           </div>
           <label className="flex items-start gap-2 text-sm">
             <input type="checkbox" name="consent" className="mt-0.5 size-4 accent-primary" />
-            <span>Pasien sudah menyetujui datanya dicatat untuk antrean.</span>
+            <span>
+              Pasien sudah menyetujui datanya dicatat untuk antrean (
+              <a href="/kebijakan-privasi" target="_blank" rel="noopener" className="text-accent underline">
+                Kebijakan Privasi
+              </a>
+              ).
+            </span>
           </label>
           <FieldError id="walkin-consent-error" message={errors?.consent} />
 
