@@ -36,3 +36,12 @@ Temuan saat Fase 1. Dicatat saja, belum diperbaiki (keputusan pemilik proyek).
   Tinjau lagi di Fase 6/8.
 - **Node**: `engines` diset `>=22.12.0` karena Vitest 5 tidak mendukung Node 20. Samakan setelan
   Node di Vercel (22 atau 24).
+
+## Dari Fase 4 untuk Fase 5
+
+- **Pengaturan** perlu menyunting `registration_open_time` (jam buka pendaftaran, bawaan 00:00)
+  bersama `cutoff_time` (jam tutup). Constraint: jam buka < jam tutup <= `close_time`.
+- **`emergency_notice`** sekarang pengumuman opsional (bawaan kosong). Isian kosong disimpan sebagai null.
+- **Tarif (`fee_rupiah`)**: putuskan apakah ikut ekspor CSV dan rekap. Perubahan tarif harus berdiri
+  sendiri (tidak bersamaan dengan perubahan status), dijaga trigger `queue_entries_status_guard`.
+- Kartu Pengaturan di panel masih hanya-baca. Tab Riwayat dan rekap serta tombol Ekspor CSV belum ada.

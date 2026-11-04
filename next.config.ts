@@ -18,6 +18,9 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   poweredByHeader: false,
+  // Next dev mencetak argumen Server Action ke terminal (bisa berisi email staf,
+  // token antrean, atau state formulir). Dimatikan: jangan log data pasien.
+  logging: { serverFunctions: false },
   turbopack: {
     rules: {
       "*.css": {

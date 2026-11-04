@@ -87,7 +87,7 @@ describe("aturan take_queue", () => {
   });
 
   it("pendaftaran online hari ini ditolak setelah cutoff_time", async () => {
-    await ctx.setSettings({ cutoff_time: "00:00" });
+    await ctx.setSettings({ cutoff_time: "00:00:01" }); // harus setelah registration_open_time (00:00)
     expect((await takeQueue(today, "Budi", testWhatsapp(104))).error?.message).toBe("REGISTRATION_CLOSED");
     await ctx.setSettings({ cutoff_time: null });
   });
@@ -119,7 +119,7 @@ describe("aturan take_queue", () => {
     // Walk-in hanya untuk hari ini. Bila hari ini sudah punya data dev, lewati agar tidak tercampur.
     if (!ctx.todayIsClean) t.skip();
     const nurse = ctx.staff.nurse.id;
-    await ctx.setSettings({ cutoff_time: "00:00" });
+    await ctx.setSettings({ cutoff_time: "00:00:01" }); // harus setelah registration_open_time (00:00)
     const { data, error } = await takeQueue(today, "Walk", testWhatsapp(107), { p_source: "walk_in", p_actor: nurse });
     await ctx.setSettings({ cutoff_time: null });
     expect(error).toBeNull();

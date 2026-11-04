@@ -3,7 +3,7 @@ import { BorderedBox, BoxSection } from "@/components/ui/bordered-box";
 import { Brand, LinkButton, PatientPage } from "@/components/patient/page-shell";
 import { SavedQueueLink } from "@/components/patient/saved-queue-link";
 import { getPracticeInfo } from "@/lib/patient/data";
-import { closedIsoDays, formatClock, formatDayGroups, splitDoctorName } from "@/lib/format";
+import { closedIsoDays, formatClock, formatDayGroups, registrationInfo, splitDoctorName } from "@/lib/format";
 
 const DEFAULT_PROFILE = "Pemeriksaan telinga, hidung, dan tenggorokan untuk anak dan dewasa.";
 
@@ -33,6 +33,11 @@ async function PracticeDetails() {
   const doctor = splitDoctorName(info.doctorName);
   const openLabel = formatDayGroups(info.openDays);
   const closedLabel = formatDayGroups(closedIsoDays(info.openDays));
+  const registration = registrationInfo({
+    openTime: info.registrationOpenTime,
+    closeTime: info.registrationCloseTime,
+    daysAhead: info.daysAhead,
+  });
 
   return (
     <>
@@ -78,8 +83,14 @@ async function PracticeDetails() {
         ) : null}
       </BorderedBox>
 
-      {info.emergencyNotice ? (
-        <p className="mt-6 rounded-box bg-noshow-bg px-[18px] py-3 text-sm text-noshow-fg">
+      <section className="mt-6 rounded-box bg-tint px-[18px] py-3 text-sm" aria-label="Info pendaftaran">
+        <p>{registration.hours}</p>
+        <p className="mt-1">{registration.range}</p>
+      </section>
+
+      {/* Pengumuman opsional dari Pengaturan; tidak tampil bila kosong. */}
+      {info.emergencyNotice?.trim() ? (
+        <p className="mt-3 rounded-box bg-noshow-bg px-[18px] py-3 text-sm text-noshow-fg">
           {info.emergencyNotice}
         </p>
       ) : null}

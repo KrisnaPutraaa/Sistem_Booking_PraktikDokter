@@ -50,7 +50,7 @@ describe("classifyTakeQueueError", () => {
   });
 
   it("memberi pesan ramah untuk kode yang dikenal", () => {
-    for (const code of ["DATE_OUT_OF_RANGE", "NOT_OPEN_DAY", "CLOSED_DAY", "REGISTRATION_CLOSED", "TOO_MANY_FOR_NUMBER"]) {
+    for (const code of ["DATE_OUT_OF_RANGE", "NOT_OPEN_DAY", "CLOSED_DAY", "REGISTRATION_CLOSED", "REGISTRATION_NOT_OPEN", "TOO_MANY_FOR_NUMBER"]) {
       const result = classifyTakeQueueError(code);
       expect(result.kind).toBe("rejected");
     }
