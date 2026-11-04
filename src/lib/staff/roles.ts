@@ -22,3 +22,18 @@ export function canAddWalkIn(role: StaffRole): boolean {
 export function canManageFee(role: StaffRole): boolean {
   return role === "nurse" || role === "doctor" || role === "owner";
 }
+
+/**
+ * Hak khusus dokter dan pemilik (keputusan Fase 5): ekspor CSV, total tarif di
+ * rekap, koreksi nama pasien, dan mengembalikan status "selesai". Database
+ * memeriksa hal yang sama (trigger queue_entries_status_guard, get_daily_recap).
+ */
+export function isDoctorOrOwner(role: StaffRole): boolean {
+  return role === "doctor" || role === "owner";
+}
+
+export const canExportCsv = isDoctorOrOwner;
+export const canSeeFeeTotals = isDoctorOrOwner;
+export const canCorrectName = isDoctorOrOwner;
+export const canReopenDone = isDoctorOrOwner;
+export const canEditSettings = isDoctorOrOwner;
