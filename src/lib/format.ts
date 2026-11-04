@@ -78,3 +78,23 @@ export function splitDoctorName(name: string): { name: string; title: string | n
   if (i === -1) return { name, title: null };
   return { name: name.slice(0, i + 1), title: name.slice(i + 1).trim() || null };
 }
+
+/**
+ * Kalimat info pendaftaran di Beranda, dari practice_settings
+ * (registration_open_time, cutoff_time, days_ahead). Jam dalam WITA.
+ */
+export function registrationInfo(opts: {
+  openTime: string;
+  closeTime: string | null;
+  daysAhead: number;
+}): { hours: string; range: string } {
+  const open = formatClock(opts.openTime);
+  const hours = opts.closeTime
+    ? `Pendaftaran online ditutup pukul ${formatClock(opts.closeTime)} dan dibuka lagi pukul ${open} pada hari praktik.`
+    : `Pendaftaran online dibuka mulai pukul ${open} pada hari praktik.`;
+  const range =
+    opts.daysAhead > 0
+      ? `Anda bisa mendaftar untuk hari ini sampai ${opts.daysAhead} hari ke depan.`
+      : "Pendaftaran hanya untuk hari ini.";
+  return { hours, range };
+}

@@ -25,13 +25,15 @@ export type DayOption = {
 const UNAVAILABLE_TEXT: Partial<Record<DayStatus, string>> = {
   full: "Kuota sudah penuh",
   holiday: "Praktik libur",
-  registration_closed: "Pendaftaran online ditutup",
+  registration_closed: "Pendaftaran hari ini sudah ditutup",
+  registration_not_open: "Pendaftaran hari ini belum dibuka",
 };
 
 const UNAVAILABLE_TAG: Partial<Record<DayStatus, string>> = {
   full: "Penuh",
   holiday: "Libur",
   registration_closed: "Ditutup",
+  registration_not_open: "Belum dibuka",
 };
 
 export function TakeQueueForm({

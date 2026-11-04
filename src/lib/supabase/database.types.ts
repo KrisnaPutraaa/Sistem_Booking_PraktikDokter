@@ -91,6 +91,7 @@ export type Database = {
           open_days: number[]
           open_time: string
           profile_text: string | null
+          registration_open_time: string
           updated_at: string
           walk_in_enabled: boolean
           whatsapp: string | null
@@ -111,6 +112,7 @@ export type Database = {
           open_days?: number[]
           open_time?: string
           profile_text?: string | null
+          registration_open_time?: string
           updated_at?: string
           walk_in_enabled?: boolean
           whatsapp?: string | null
@@ -131,6 +133,7 @@ export type Database = {
           open_days?: number[]
           open_time?: string
           profile_text?: string | null
+          registration_open_time?: string
           updated_at?: string
           walk_in_enabled?: boolean
           whatsapp?: string | null
@@ -165,6 +168,7 @@ export type Database = {
           complaint: string | null
           consent_at: string
           created_at: string
+          fee_rupiah: number | null
           finished_at: string | null
           id: string
           name: string
@@ -181,6 +185,7 @@ export type Database = {
           complaint?: string | null
           consent_at: string
           created_at?: string
+          fee_rupiah?: number | null
           finished_at?: string | null
           id?: string
           name: string
@@ -197,6 +202,7 @@ export type Database = {
           complaint?: string | null
           consent_at?: string
           created_at?: string
+          fee_rupiah?: number | null
           finished_at?: string | null
           id?: string
           name?: string

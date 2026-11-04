@@ -18,6 +18,9 @@ export type PracticeInfo = {
   profileText: string | null;
   emergencyNotice: string | null;
   openTime: string;
+  registrationOpenTime: string;
+  registrationCloseTime: string | null;
+  daysAhead: number;
   closeTime: string;
   openDays: number[];
   dailyQuota: number;
@@ -29,7 +32,7 @@ export async function getPracticeInfo(): Promise<PracticeInfo> {
   const { data, error } = await createAdminClient()
     .from("practice_settings")
     .select(
-      "doctor_name, clinic_name, address, whatsapp, profile_text, emergency_notice, open_time, close_time, open_days, daily_quota, avg_minutes",
+      "doctor_name, clinic_name, address, whatsapp, profile_text, emergency_notice, open_time, close_time, open_days, daily_quota, avg_minutes, registration_open_time, cutoff_time, days_ahead",
     )
     .eq("id", 1)
     .single();
@@ -43,6 +46,9 @@ export async function getPracticeInfo(): Promise<PracticeInfo> {
     profileText: data.profile_text,
     emergencyNotice: data.emergency_notice,
     openTime: data.open_time,
+    registrationOpenTime: data.registration_open_time,
+    registrationCloseTime: data.cutoff_time,
+    daysAhead: data.days_ahead,
     closeTime: data.close_time,
     openDays: data.open_days,
     dailyQuota: data.daily_quota,
@@ -51,7 +57,13 @@ export async function getPracticeInfo(): Promise<PracticeInfo> {
 }
 
 /** Status dari get_availability. "closed" = bukan hari praktik. */
-export type DayStatus = "available" | "full" | "holiday" | "closed" | "registration_closed";
+export type DayStatus =
+  | "available"
+  | "full"
+  | "holiday"
+  | "closed"
+  | "registration_closed"
+  | "registration_not_open";
 
 export type DayAvailability = {
   date: string;
@@ -60,7 +72,14 @@ export type DayAvailability = {
   reason: string | null;
 };
 
-const DAY_STATUSES: readonly string[] = ["available", "full", "holiday", "closed", "registration_closed"];
+const DAY_STATUSES: readonly string[] = [
+  "available",
+  "full",
+  "holiday",
+  "closed",
+  "registration_closed",
+  "registration_not_open",
+];
 
 export async function getAvailability(): Promise<DayAvailability[]> {
   await connection();

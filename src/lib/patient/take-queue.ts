@@ -44,7 +44,8 @@ const TAKE_QUEUE_MESSAGES: Record<string, string> = {
   DATE_OUT_OF_RANGE: "Tanggal ini sudah tidak bisa dipilih. Pilih hari lain, ya.",
   NOT_OPEN_DAY: "Praktik tidak buka pada hari itu. Pilih hari lain, ya.",
   CLOSED_DAY: "Praktik libur pada hari itu. Pilih hari lain, ya.",
-  REGISTRATION_CLOSED: "Pendaftaran online untuk hari ini sudah ditutup. Pilih hari lain, ya.",
+  REGISTRATION_CLOSED: "Pendaftaran hari ini sudah ditutup. Pilih hari lain, ya.",
+  REGISTRATION_NOT_OPEN: "Pendaftaran hari ini belum dibuka. Pilih hari lain, ya.",
   TOO_MANY_FOR_NUMBER: "Nomor WhatsApp ini sudah mencapai batas antrean untuk hari itu.",
 };
 

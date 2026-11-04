@@ -7,6 +7,7 @@ import {
   formatDayGroups,
   formatDayOption,
   formatLongDate,
+  registrationInfo,
   splitDoctorName,
 } from "./format";
 
@@ -59,5 +60,21 @@ describe("splitDoctorName", () => {
       title: "Sp.THT-KL",
     });
     expect(splitDoctorName("dr. Tanpa Gelar")).toEqual({ name: "dr. Tanpa Gelar", title: null });
+  });
+});
+
+describe("registrationInfo", () => {
+  it("menyebut jam tutup, jam buka, dan jangkauan hari dari pengaturan", () => {
+    expect(registrationInfo({ openTime: "00:00:00", closeTime: "21:00:00", daysAhead: 3 })).toEqual({
+      hours: "Pendaftaran online ditutup pukul 21.00 dan dibuka lagi pukul 00.00 pada hari praktik.",
+      range: "Anda bisa mendaftar untuk hari ini sampai 3 hari ke depan.",
+    });
+  });
+
+  it("tanpa jam tutup dan tanpa hari ke depan", () => {
+    expect(registrationInfo({ openTime: "06:30:00", closeTime: null, daysAhead: 0 })).toEqual({
+      hours: "Pendaftaran online dibuka mulai pukul 06.30 pada hari praktik.",
+      range: "Pendaftaran hanya untuk hari ini.",
+    });
   });
 });
