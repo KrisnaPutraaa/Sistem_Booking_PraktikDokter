@@ -75,7 +75,8 @@ async function createStaff(role: Role): Promise<Staff> {
   const signedIn = await client.auth.signInWithPassword({ email, password });
   if (signedIn.error) throw signedIn.error;
 
-  // Fase 6: owner dan dokter wajib aal2 di RLS (current_app_role).
+  // Owner dan dokter uji memasang MFA (sukarela sejak revisi Fase 6), jadi
+  // jalur "akun dengan faktor wajib aal2" ikut teruji di semua suite.
   if (role !== "nurse") await upgradeToAal2(client);
   return { id, client };
 }

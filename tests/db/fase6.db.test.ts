@@ -13,7 +13,7 @@ import {
   upgradeToAal2,
 } from "./helpers";
 
-// Fase 6: aal2 untuk owner dan dokter, akun nonaktif, batas percobaan, kode
+// Fase 6 (revisi: MFA opsional, saklar mfa_wajib bawaan mati), akun nonaktif, batas percobaan, kode
 // pemulihan, anonimkan data pasien (atas permintaan dan otomatis).
 let ctx: DbTestContext;
 let date: string;
@@ -54,19 +54,44 @@ describe("verifikasi dua langkah di level database", () => {
     await take(date, "Pasien Aal", 600);
   });
 
-  it("owner dan dokter dengan kata sandi saja (aal1) tidak melihat antrean dan tidak bisa mengubah pengaturan", async () => {
+  it("saklar mfa_wajib bawaan mati dan tidak terbuka untuk anon", async () => {
+    const asStaff = await ctx.staff.nurse.client.rpc("mfa_wajib");
+    expect(asStaff.error).toBeNull();
+    expect(asStaff.data).toBe(false);
+
+    const asAnon = await anon.rpc("mfa_wajib");
+    expect(asAnon.error?.code).toBe(PERMISSION_DENIED);
+  });
+
+  it("owner dan dokter tanpa MFA cukup kata sandi (aal1): melihat antrean dan bisa mengubah pengaturan", async () => {
+    const current = await admin.from("practice_settings").select("max_calls").eq("id", 1).single();
+    if (current.error) throw current.error;
+
     for (const role of ["owner", "doctor"] as const) {
       const user = await extraUser(role);
       const client = await signInAal1(user.email, user.password);
 
       const rows = await client.from("queue_entries").select("id").eq("queue_date", date);
       expect(rows.error, role).toBeNull();
-      expect(rows.data, role).toEqual([]);
+      expect(rows.data?.length, role).toBe(1);
 
-      const upd = await client.from("practice_settings").update({ max_calls: 3 }).eq("id", 1).select("id");
-      expect(upd.data ?? [], role).toEqual([]);
+      const upd = await client
+        .from("practice_settings")
+        .update({ max_calls: current.data.max_calls })
+        .eq("id", 1)
+        .select("id");
+      expect(upd.data?.length, role).toBe(1);
       await client.auth.signOut({ scope: "local" });
     }
+  });
+
+  it("owner atau dokter yang memasang MFA wajib aal2", async () => {
+    const user = await extraUser("doctor");
+    const first = await signInAal1(user.email, user.password);
+    await upgradeToAal2(first);
+    const second = await signInAal1(user.email, user.password);
+    expect((await second.from("queue_entries").select("id").eq("queue_date", date)).data).toEqual([]);
+    await Promise.all([first.auth.signOut({ scope: "local" }), second.auth.signOut({ scope: "local" })]);
   });
 
   it("owner dan dokter aal2 melihat antrean", async () => {
