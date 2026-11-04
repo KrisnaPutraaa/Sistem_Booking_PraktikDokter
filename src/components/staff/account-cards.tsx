@@ -12,6 +12,7 @@ import {
 } from "@/app/staf/akun/actions";
 import { Button } from "@/components/ui/button";
 import { ROLE_LABEL, type StaffRole } from "@/lib/staff/roles";
+import { useClearOnHide } from "@/lib/use-clear-on-hide";
 import { StaffCard } from "./card";
 import { FieldError, StaffInput } from "./field";
 import { RecoveryCodesPanel } from "./recovery-codes-panel";
@@ -41,6 +42,7 @@ export function MySecurityCard({
   codesRemaining: number | null;
 }) {
   const [codes, setCodes] = useState<string[] | null>(null);
+  useClearOnHide(() => setCodes(null));
   const [error, setError] = useState<string | null>(null);
   const [confirmDisable, setConfirmDisable] = useState(false);
   const [pending, startTransition] = useTransition();

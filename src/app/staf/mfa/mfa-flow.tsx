@@ -5,6 +5,7 @@ import { useActionState, useState, useTransition } from "react";
 import { FieldError, StaffInput } from "@/components/staff/field";
 import { RecoveryCodesPanel } from "@/components/staff/recovery-codes-panel";
 import { Button } from "@/components/ui/button";
+import { useClearOnHide } from "@/lib/use-clear-on-hide";
 import {
   type EnrollVerifyState,
   redeemRecoveryCodeAction,
@@ -17,21 +18,36 @@ import {
 export type MfaMode = "enroll-required" | "enroll-optional" | "verify" | "done";
 
 /**
- * Satu komponen untuk semua langkah, supaya kode pemulihan di state tetap
- * tampil walau halaman dirender ulang setelah sesi naik ke aal2.
+ * Satu komponen untuk semua langkah, supaya kode pemulihan tetap tampil walau
+ * halaman dirender ulang setelah sesi naik ke aal2. Kode disimpan di state
+ * terpisah (bukan state aksi) dan dibuang saat selesai atau saat halaman
+ * ditinggalkan, supaya tidak muncul lagi dari cache halaman Next.
  */
 export function MfaFlow({ mode }: { mode: MfaMode }) {
   const router = useRouter();
-  const [enrollState, enrollAction, enrollPending] = useActionState<EnrollVerifyState, FormData>(verifyEnrollAction, {
-    status: "idle",
-  });
+  const [codes, setCodes] = useState<string[] | null>(null);
+  useClearOnHide(() => setCodes(null));
+  const [enrollState, enrollAction, enrollPending] = useActionState<EnrollVerifyState, FormData>(
+    async (prev, formData) => {
+      const result = await verifyEnrollAction(prev, formData);
+      if (result.status === "codes") {
+        setCodes(result.codes);
+        return { status: "idle" };
+      }
+      return result;
+    },
+    { status: "idle" },
+  );
 
-  if (enrollState.status === "codes") {
+  if (codes) {
     return (
       <RecoveryCodesPanel
-        codes={enrollState.codes}
+        codes={codes}
         doneLabel="Lanjut ke panel"
-        onDone={() => router.replace("/staf")}
+        onDone={() => {
+          setCodes(null);
+          router.replace("/staf");
+        }}
       />
     );
   }

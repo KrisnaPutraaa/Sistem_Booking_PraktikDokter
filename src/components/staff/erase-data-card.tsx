@@ -3,8 +3,9 @@
 import { useActionState, useState, useTransition } from "react";
 import { type ErasableEntry, eraseEntriesAction, searchPatientAction, type SearchState } from "@/app/staf/hapus-data/actions";
 import { Button } from "@/components/ui/button";
-import { formatDay } from "@/lib/format";
+import { formatLongDate } from "@/lib/format";
 import { QUEUE_STATUS_LABEL } from "@/lib/queue-status";
+import { useClearOnHide } from "@/lib/use-clear-on-hide";
 import { formatWhatsappDisplay } from "@/lib/whatsapp";
 import { StaffCard } from "./card";
 import { FieldError, StaffInput } from "./field";
@@ -12,7 +13,18 @@ import { FieldError, StaffInput } from "./field";
 const isActive = (e: ErasableEntry) => e.status === "waiting" || e.status === "in_progress";
 
 export function EraseDataCard() {
-  const [state, action, pending] = useActionState<SearchState, FormData>(searchPatientAction, { status: "idle" });
+  // Hasil pencarian (nama pasien) disimpan di state sendiri dan dibuang saat
+  // halaman ditinggalkan, supaya tidak dipulihkan dari cache halaman Next.
+  const [results, setResults] = useState<Extract<SearchState, { status: "ok" }> | null>(null);
+  useClearOnHide(() => setResults(null));
+  const [state, action, pending] = useActionState<SearchState, FormData>(
+    async (prev, formData) => {
+      const result = await searchPatientAction(prev, formData);
+      setResults(result.status === "ok" ? result : null);
+      return result.status === "ok" ? { status: "idle" } : result;
+    },
+    { status: "idle" },
+  );
 
   return (
     <StaffCard className="min-w-0">
@@ -44,7 +56,7 @@ export function EraseDataCard() {
         </Button>
       </form>
 
-      {state.status === "ok" ? <Results key={state.at} whatsapp={state.whatsappDisplay} entries={state.entries} /> : null}
+      {results ? <Results key={results.at} whatsapp={results.whatsappDisplay} entries={results.entries} /> : null}
     </StaffCard>
   );
 }
@@ -112,14 +124,14 @@ function Results({ whatsapp, entries }: { whatsapp: string; entries: ErasableEnt
                   <td className="py-2">
                     <input
                       type="checkbox"
-                      aria-label={`Pilih antrean ${formatDay(e.date)} nomor ${e.number}`}
+                      aria-label={`Pilih antrean ${formatLongDate(e.date)} nomor ${e.number}`}
                       checked={!disabled && selected.has(e.id)}
                       disabled={disabled}
                       onChange={() => toggle(e.id)}
                       className="size-4 accent-primary"
                     />
                   </td>
-                  <td className="py-2 pr-4 whitespace-nowrap">{formatDay(e.date)}</td>
+                  <td className="py-2 pr-4 whitespace-nowrap">{formatLongDate(e.date)}</td>
                   <td className="py-2 pr-4">{e.number}</td>
                   <td className="py-2 pr-4">{gone ? <span className="text-muted">Data dihapus</span> : e.name}</td>
                   <td className="py-2">
