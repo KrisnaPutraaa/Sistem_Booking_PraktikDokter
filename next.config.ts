@@ -59,6 +59,13 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  // Satu halaman masuk untuk semua peran; alamat lain hanya pengalihan (307).
+  async redirects() {
+    return [
+      { source: "/dokter/masuk", destination: "/staf/masuk", permanent: false },
+      { source: "/owner/masuk", destination: "/staf/masuk", permanent: false },
+    ];
+  },
   async headers() {
     return [
       { source: "/:path*", headers: securityHeaders },
