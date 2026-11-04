@@ -102,10 +102,13 @@ describe("tarif pasien", () => {
 
   it("perawat tetap tidak bisa mengubah nama, WhatsApp, atau keluhan", async () => {
     const nurse = ctx.staff.nurse.client;
-    for (const patch of [{ name: "Ganti" }, { whatsapp: testWhatsapp(401) }, { complaint: "x" }]) {
+    for (const patch of [{ whatsapp: testWhatsapp(401) }, { complaint: "x" }]) {
       const { error } = await nurse.from("queue_entries").update(patch).eq("id", entryId);
       expect(error?.code, Object.keys(patch)[0]).toBe(PERMISSION_DENIED);
     }
+    // Nama: hak kolom ada sejak Fase 5, perawat ditolak trigger.
+    const rename = await nurse.from("queue_entries").update({ name: "Ganti" }).eq("id", entryId);
+    expect(rename.error?.message).toBe("NAME_NOT_ALLOWED");
   });
 
   it("perubahan tarif tercatat di audit log dengan pelaku dan nilai lama/baru", async () => {
