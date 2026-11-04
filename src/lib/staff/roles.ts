@@ -9,12 +9,13 @@ export const ROLE_LABEL: Record<StaffRole, string> = {
 };
 
 /**
- * Verifikasi dua langkah (TOTP) wajib untuk dokter dan pemilik (keputusan
- * Fase 6), opsional untuk perawat. Database menegakkan hal yang sama di
- * current_app_role(): peran ini tanpa sesi aal2 tidak mendapat akses.
+ * Verifikasi dua langkah (TOTP) opsional untuk semua peran (revisi Fase 6,
+ * 4 November 2026). Bila saklar database mfa_wajib dinyalakan (hanya lewat SQL
+ * Editor), dokter dan pemilik kembali wajib. Database menegakkan hal yang sama
+ * di current_app_role(); ini hanya untuk tampilan dan pengalihan.
  */
-export function mfaRequiredFor(role: StaffRole): boolean {
-  return role === "doctor" || role === "owner";
+export function mfaRequiredFor(role: StaffRole, mfaWajib: boolean): boolean {
+  return mfaWajib && (role === "doctor" || role === "owner");
 }
 
 /** Hapus data pasien atas permintaan dan kelola akun staf: hanya pemilik. */

@@ -79,7 +79,7 @@ export function MySecurityCard({
         <dt className="text-muted">Verifikasi dua langkah</dt>
         <dd>
           {hasMfa ? "Aktif" : "Belum aktif"}
-          <span className="text-muted"> · {mfaRequired ? "wajib untuk peran ini" : "opsional untuk perawat"}</span>
+          <span className="text-muted"> · {mfaRequired ? "wajib untuk peran ini" : "opsional"}</span>
         </dd>
         {hasMfa ? (
           <>

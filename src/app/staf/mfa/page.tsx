@@ -8,8 +8,8 @@ import { lookupStaff } from "@/lib/staff/session";
 import { MfaFlow, type MfaMode } from "./mfa-flow";
 
 /**
- * Verifikasi dua langkah: pasang perangkat (wajib untuk dokter dan pemilik,
- * opsional untuk perawat) atau masukkan kode saat masuk. Halaman ini tidak
+ * Verifikasi dua langkah: pasang perangkat (opsional; wajib hanya bila saklar
+ * mfa_wajib menyala untuk dokter dan pemilik) atau masukkan kode saat masuk. Halaman ini tidak
  * mengalihkan staf yang sudah aal2, supaya kode pemulihan yang baru dibuat
  * tetap tampil setelah sesi diperbarui.
  */

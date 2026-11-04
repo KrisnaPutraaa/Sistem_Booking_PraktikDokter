@@ -6,7 +6,7 @@ import { MySecurityCard, PasswordCard, StaffAccountsCard } from "@/components/st
 import { StaffHeader, StaffTabs } from "@/components/staff/staff-header";
 import { listStaffAccounts } from "@/lib/staff/accounts";
 import { recoveryCodesRemaining } from "@/lib/staff/mfa.server";
-import { canManageStaff, mfaRequiredFor } from "@/lib/staff/roles";
+import { canManageStaff } from "@/lib/staff/roles";
 import { requireStaff } from "@/lib/staff/session";
 import { APP_TIMEZONE } from "@/lib/time";
 
@@ -40,7 +40,7 @@ async function Account() {
             email={staff.email}
             role={staff.role}
             hasMfa={hasMfa}
-            mfaRequired={mfaRequiredFor(staff.role)}
+            mfaRequired={staff.mfaRequired}
             codesRemaining={codesRemaining}
           />
           {accounts ? (

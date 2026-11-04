@@ -13,14 +13,17 @@ export type StaffSession = {
   role: StaffRole;
   /** Faktor TOTP terverifikasi (verifikasi dua langkah sudah dipasang). */
   verifiedFactorIds: string[];
+  /** Verifikasi dua langkah wajib untuk akun ini (saklar mfa_wajib dan peran). */
+  mfaRequired: boolean;
   supabase: StaffClient;
 };
 
 /**
  * - staff: boleh memakai panel.
- * - mfa: kata sandi benar, tetapi sesi belum aal2 padahal wajib (owner, dokter,
- *   atau siapa pun yang sudah memasang faktor). step "enroll" = belum punya
- *   faktor, "verify" = sudah punya, tinggal memasukkan kode.
+ * - mfa: kata sandi benar, tetapi sesi belum aal2 padahal diperlukan: akun
+ *   sudah memasang faktor, atau saklar mfa_wajib menyala untuk owner/dokter
+ *   (bawaan mati). step "enroll" = belum punya faktor, "verify" = sudah punya,
+ *   tinggal memasukkan kode.
  * - no_profile: belum diberi peran, atau akun dinonaktifkan pemilik.
  */
 export type StaffLookup =
@@ -51,8 +54,12 @@ export const lookupStaff = cache(async (): Promise<StaffLookup> => {
   if (!profile || profile.disabled_at) return { kind: "no_profile" };
 
   // getUser di atas sudah memvalidasi token ke server Auth; aal dibaca dari token yang sama.
-  const { data: aal, error: aalError } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  const [{ data: aal, error: aalError }, { data: mfaWajib, error: wajibError }] = await Promise.all([
+    supabase.auth.mfa.getAuthenticatorAssuranceLevel(),
+    supabase.rpc("mfa_wajib"),
+  ]);
   if (aalError) throw new Error(`aal gagal dibaca (${aalError.code ?? "unknown"})`);
+  if (wajibError) throw new Error(`mfa_wajib gagal dibaca (${wajibError.code})`);
 
   const verifiedFactorIds = (user.factors ?? [])
     .filter((f) => f.status === "verified" && f.factor_type === "totp")
@@ -64,10 +71,11 @@ export const lookupStaff = cache(async (): Promise<StaffLookup> => {
     fullName: profile.full_name,
     role: profile.role,
     verifiedFactorIds,
+    mfaRequired: mfaRequiredFor(profile.role, mfaWajib === true),
     supabase,
   };
 
-  const needsAal2 = mfaRequiredFor(profile.role) || verifiedFactorIds.length > 0;
+  const needsAal2 = staff.mfaRequired || verifiedFactorIds.length > 0;
   if (needsAal2 && aal.currentLevel !== "aal2") {
     return { kind: "mfa", step: verifiedFactorIds.length > 0 ? "verify" : "enroll", staff };
   }
@@ -76,7 +84,8 @@ export const lookupStaff = cache(async (): Promise<StaffLookup> => {
 
 /**
  * Untuk halaman /staf/*. Tamu ke halaman masuk; sesi yang belum lolos
- * verifikasi dua langkah ke /staf/mfa; akun tanpa profil atau nonaktif
+ * verifikasi dua langkah (hanya bila akun memasangnya, atau saklar mfa_wajib
+ * menyala) ke /staf/mfa; akun tanpa profil atau nonaktif
  * dikeluarkan lewat /staf/keluar supaya cookie sesinya dihapus.
  */
 export async function requireStaff(): Promise<StaffSession> {
