@@ -176,6 +176,7 @@ function HistoryRow({
               maxLength={80}
               autoComplete="off"
               autoFocus
+              onFocus={(e) => e.currentTarget.select()}
               disabled={pending}
               className="h-10 w-56 rounded-lg border border-staff-line bg-white px-3"
               onKeyDown={(e) => {

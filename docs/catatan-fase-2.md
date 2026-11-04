@@ -45,3 +45,25 @@ Temuan saat Fase 1. Dicatat saja, belum diperbaiki (keputusan pemilik proyek).
 - **Tarif (`fee_rupiah`)**: putuskan apakah ikut ekspor CSV dan rekap. Perubahan tarif harus berdiri
   sendiri (tidak bersamaan dengan perubahan status), dijaga trigger `queue_entries_status_guard`.
 - Kartu Pengaturan di panel masih hanya-baca. Tab Riwayat dan rekap serta tombol Ekspor CSV belum ada.
+
+## Dari Fase 5 untuk Fase 6 ke atas
+
+- **Migrasi `20261105000001_fase5.sql`** sudah di-push ke `praktik-tht-dev` saja. Project produksi
+  (Fase 7) perlu `supabase db push` sendiri.
+- **Hak kolom `name`** sekarang diberikan ke `authenticated`; pembatasan ke dokter dan owner dijaga
+  trigger `queue_entries_status_guard` (`NAME_NOT_ALLOWED`). Perawat ditolak dengan kode P0001,
+  bukan 42501 lagi (uji access/fase4 disesuaikan).
+- **Audit koreksi nama**: `new_data.name_changed = true`, tanpa nama lama atau baru.
+- **`done -> in_progress`** hanya dokter dan owner (`REVERT_NOT_ALLOWED`); `finished_at` dikosongkan,
+  `called_at` dan `call_count` tetap. Server Action membatasi status asal per aksi
+  (`STATUS_ACTION_FROM`), jadi "Panggil" pada pasien selesai tidak ikut membuka ulang.
+- **CSV**: per pasien, tanpa WhatsApp dan keluhan, BOM UTF-8, pemisah `;`, CRLF, rumus dinetralkan
+  dengan `'`. Sudah diuji di browser (byte BOM, header, escape), **belum dibuka di Excel sungguhan**.
+- **Rekap**: rata-rata durasi = `finished_at - called_at` (panggilan terakhir), ditimbang per pasien.
+  `get_daily_recap` membatasi 92 hari dan mengembalikan `out_total_fee = null` untuk perawat.
+- **Belum ada di halaman Pengaturan** (di luar daftar Fase 5): `max_calls`, nama klinik, alamat,
+  nomor WhatsApp praktik, dan teks profil (bagian 9: "diisi dari halaman Pengaturan").
+- **Hari libur** pada tanggal yang sudah punya antrean aktif diizinkan dengan peringatan; antrean
+  yang ada tidak dibatalkan otomatis. Perlu keputusan bila ingin pembatalan dan pesan WhatsApp massal.
+- Filter "Semua status" dari desain Riwayat dipasang di kartu detail pasien per tanggal (filter ini
+  tidak bermakna untuk tabel rekap per hari).

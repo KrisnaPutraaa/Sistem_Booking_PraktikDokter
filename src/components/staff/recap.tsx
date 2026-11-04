@@ -14,11 +14,11 @@ export function RecapSummaryCards({ summary }: { summary: RecapSummary }) {
     cards.push({ label: "Total tarif", value: formatRupiah(summary.totalFee), tone: "text-ink" });
   }
   return (
-    <dl className={cn("mt-6 grid grid-cols-2 gap-4", cards.length === 5 ? "lg:grid-cols-5" : "lg:grid-cols-4")}>
+    <dl className={cn("mt-6 grid grid-cols-2 gap-4", cards.length === 5 ? "lg:grid-cols-3 xl:grid-cols-5" : "lg:grid-cols-4")}>
       {cards.map((c) => (
         <div key={c.label} className="min-w-0 rounded-box border border-staff-line bg-white px-5 py-4">
           <dt className="text-muted">{c.label}</dt>
-          <dd className={`mt-1 truncate text-3xl font-semibold sm:text-4xl ${c.tone}`}>{c.value}</dd>
+          <dd className={`mt-1 text-3xl font-semibold break-words sm:text-4xl ${c.tone}`}>{c.value}</dd>
         </div>
       ))}
     </dl>
