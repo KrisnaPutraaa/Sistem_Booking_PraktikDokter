@@ -17,22 +17,26 @@ export function LoginForm() {
         </p>
       ) : null}
 
-      <label htmlFor="email" className="block font-semibold">
-        Email
+      <label htmlFor="username" className="block font-semibold">
+        Username
       </label>
       <StaffInput
-        id="email"
-        name="email"
-        type="email"
+        id="username"
+        name="username"
+        type="text"
         autoComplete="username"
-        placeholder="perawat@praktik.id"
-        defaultValue={state.status === "error" ? state.email : undefined}
-        aria-invalid={fieldErrors?.email ? true : undefined}
-        aria-describedby={fieldErrors?.email ? "email-error" : undefined}
+        autoCapitalize="none"
+        autoCorrect="off"
+        spellCheck={false}
+        maxLength={32}
+        placeholder="mis. perawat.ayu"
+        defaultValue={state.status === "error" ? state.username : undefined}
+        aria-invalid={fieldErrors?.username ? true : undefined}
+        aria-describedby={fieldErrors?.username ? "username-error" : undefined}
         className="mt-2"
         required
       />
-      <FieldError id="email-error" message={fieldErrors?.email} />
+      <FieldError id="username-error" message={fieldErrors?.username} />
 
       <label htmlFor="password" className="mt-5 block font-semibold">
         Kata sandi

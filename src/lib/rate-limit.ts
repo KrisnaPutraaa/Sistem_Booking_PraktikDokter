@@ -1,7 +1,7 @@
 /**
  * Batas percobaan (Fase 6). Bagian murni: daftar batas dan pembacaan IP klien.
  * Penghitungan ada di database (hit_rate_limit), kunci disimpan sebagai HMAC,
- * jadi IP dan email tidak pernah tersimpan mentah. Lihat rate-limit.server.ts.
+ * jadi IP dan username tidak pernah tersimpan mentah. Lihat rate-limit.server.ts.
  *
  * Batas ini kebijakan keamanan, bukan pengaturan praktik, sehingga ditulis di
  * kode (bukan practice_settings). Ambil nomor sengaja longgar: operator seluler
@@ -10,7 +10,7 @@
 export const RATE_LIMITS = {
   takeQueueIp: { bucket: "take_queue_ip", max: 10, windowSeconds: 15 * 60 },
   loginIp: { bucket: "login_ip", max: 20, windowSeconds: 15 * 60 },
-  loginEmail: { bucket: "login_email", max: 8, windowSeconds: 15 * 60 },
+  loginUsername: { bucket: "login_username", max: 8, windowSeconds: 15 * 60 },
   mfaUser: { bucket: "mfa_user", max: 8, windowSeconds: 15 * 60 },
   recoveryUser: { bucket: "recovery_user", max: 5, windowSeconds: 60 * 60 },
   passwordUser: { bucket: "password_user", max: 5, windowSeconds: 15 * 60 },
