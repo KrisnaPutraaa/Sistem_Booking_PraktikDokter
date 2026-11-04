@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { normalizeWhatsapp } from "./whatsapp";
+import { formatWhatsappDisplay, normalizeWhatsapp } from "./whatsapp";
 
 describe("normalizeWhatsapp", () => {
   it.each([
@@ -24,5 +24,12 @@ describe("normalizeWhatsapp", () => {
     ["plus di tengah", "0812+34567890"],
   ])("menolak %s", (_label, input) => {
     expect(normalizeWhatsapp(input)).toBeNull();
+  });
+});
+
+describe("formatWhatsappDisplay", () => {
+  it("628xx menjadi 08xx berkelompok empat digit", () => {
+    expect(formatWhatsappDisplay("6281234567890")).toBe("0812 3456 7890");
+    expect(formatWhatsappDisplay("628123456")).toBe("0812 3456");
   });
 });
