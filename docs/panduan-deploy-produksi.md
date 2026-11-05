@@ -185,7 +185,15 @@ pendaftaran gagal tertutup (`src/lib/turnstile-config.ts`).
   (terdeteksi otomatis). Biarkan Build/Install command bawaan.
 - [ ] **Sebelum deploy pertama**, isi variabel lingkungan (tabel di bawah). Bila deploy sudah terlanjur jalan tanpa
   variabel, deploy itu gagal saat dipakai; tidak apa-apa, isi lalu *Redeploy*.
-- [ ] **Settings, Build and Deployment, Node.js Version**: **22.x** (sama dengan CI; `engines` meminta 22.12 ke atas).
+- [ ] **Settings, Build and Deployment, Node.js Version**: **22.x** (sama dengan CI).
+  - Sejak 5 November 2026, `engines.node` di `package.json` (dan `package-lock.json`) adalah `^22.12.0`. Artinya
+    minimal 22.12, dan hanya versi 22. Sebelumnya `>=22.12.0`, yang membiarkan Vercel memakai Node 24 atau versi lebih
+    baru.
+  - Vercel mengikuti `engines` dan mengabaikan pilihan di dashboard bila keduanya berbeda. Jadi deploy tetap
+    memakai Node 22 meskipun pengaturan dashboard terlanjur 24.x. Log build memberi peringatan bila keduanya
+    tidak sama; samakan ke 22.x.
+  - Sudah diuji di Node 22.23.4: `npm ci --engine-strict` dan `npm run build` lolos. Tidak ada dependensi atau
+    kode aplikasi yang berubah. Repo tidak memakai `.nvmrc`; Vercel tidak membacanya.
 - [ ] **Settings, Functions, Function Region**: **Singapore (sin1)**, dekat dengan database. Bawaan Vercel adalah
   Washington (`iad1`), yang membuat setiap permintaan menyeberang ke Amerika dan kembali. Hobby hanya boleh satu
   region; bila sin1 tidak bisa dipilih di Hobby, catat dan pilih di B3.
