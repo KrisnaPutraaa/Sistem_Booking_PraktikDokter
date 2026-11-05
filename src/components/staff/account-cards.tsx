@@ -28,14 +28,14 @@ function Alert({ message }: { message: string | null | undefined }) {
 
 export function MySecurityCard({
   fullName,
-  email,
+  username,
   role,
   hasMfa,
   mfaRequired,
   codesRemaining,
 }: {
   fullName: string;
-  email: string;
+  username: string;
   role: StaffRole;
   hasMfa: boolean;
   mfaRequired: boolean;
@@ -72,14 +72,14 @@ export function MySecurityCard({
       <dl className="mt-4 grid grid-cols-[max-content_1fr] gap-x-6 gap-y-2 text-sm">
         <dt className="text-muted">Nama</dt>
         <dd>{fullName}</dd>
-        <dt className="text-muted">Email</dt>
-        <dd className="break-all">{email}</dd>
+        <dt className="text-muted">Username</dt>
+        <dd className="break-all">{username}</dd>
         <dt className="text-muted">Peran</dt>
         <dd>{ROLE_LABEL[role]}</dd>
         <dt className="text-muted">Verifikasi dua langkah</dt>
         <dd>
           {hasMfa ? "Aktif" : "Belum aktif"}
-          <span className="text-muted"> · {mfaRequired ? "wajib untuk peran ini" : "opsional untuk perawat"}</span>
+          <span className="text-muted"> · {mfaRequired ? "wajib untuk peran ini" : "opsional"}</span>
         </dd>
         {hasMfa ? (
           <>
@@ -202,7 +202,7 @@ export type StaffAccountRow = {
   id: string;
   fullName: string;
   role: StaffRole;
-  email: string;
+  username: string;
   hasMfa: boolean;
   disabled: boolean;
   lastSignIn: string;
@@ -261,7 +261,7 @@ function AccountRow({ account, onError }: { account: StaffAccountRow; onError: (
     <tr className={`border-b border-staff-line align-top ${pending ? "opacity-60" : ""}`}>
       <td className="py-3 pr-4">
         <p className={account.disabled ? "text-muted line-through" : undefined}>{account.fullName}</p>
-        <p className="break-all text-muted">{account.email}</p>
+        <p className="break-all text-muted">{account.username}</p>
         {account.disabled ? <p className="text-xs text-noshow-fg uppercase">nonaktif</p> : null}
       </td>
       <td className="py-3 pr-4">{ROLE_LABEL[account.role]}</td>

@@ -41,9 +41,12 @@ describe("walkInSchema", () => {
 });
 
 describe("loginSchema", () => {
-  it("memeriksa format email", () => {
-    expect(loginSchema.safeParse({ email: "perawat@praktik.id", password: "x" }).success).toBe(true);
-    expect(loginSchema.safeParse({ email: "bukan-email", password: "x" }).success).toBe(false);
+  it("menormalisasi username", () => {
+    expect(loginSchema.parse({ username: "  KrisOwner ", password: "x" }).username).toBe("krisowner");
+  });
+
+  it.each(["", "ab", "a b", "perawat@praktik.id", "-awal", "akhir.", "x".repeat(33)])("menolak %j", (u) => {
+    expect(loginSchema.safeParse({ username: u, password: "x" }).success).toBe(false);
   });
 });
 

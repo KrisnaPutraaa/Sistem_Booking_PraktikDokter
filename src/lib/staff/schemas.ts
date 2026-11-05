@@ -1,14 +1,21 @@
 import { z } from "zod";
 import type { QueueStatus } from "@/lib/queue-status";
 import { normalizeWhatsapp } from "@/lib/whatsapp";
+import { normalizeUsername, USERNAME_PATTERN } from "./username";
 
 export const loginSchema = z.object({
-  email: z
-    .string({ error: "Email wajib diisi." })
-    .trim()
-    .min(1, { error: "Email wajib diisi." })
-    .max(254)
-    .pipe(z.email({ error: "Format email tidak valid." })),
+  // Bentuk saja yang diperiksa; username yang tidak terdaftar ditolak dengan
+  // pesan umum yang sama dengan kata sandi salah.
+  username: z
+    .string({ error: "Username wajib diisi." })
+    .max(100, { error: "Username tidak valid." })
+    .transform(normalizeUsername)
+    .pipe(
+      z
+        .string()
+        .min(1, { error: "Username wajib diisi." })
+        .regex(USERNAME_PATTERN, { error: "Username tidak valid." }),
+    ),
   password: z
     .string({ error: "Kata sandi wajib diisi." })
     .min(1, { error: "Kata sandi wajib diisi." })

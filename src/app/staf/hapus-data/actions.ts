@@ -11,7 +11,7 @@ import { normalizeWhatsapp } from "@/lib/whatsapp";
  * Hapus data pasien atas permintaan (hanya pemilik). Pencarian lewat Server
  * Action (POST), bukan parameter URL, supaya nomor WhatsApp tidak tercatat di
  * log akses. Penghapusan memanggil erase_queue_entries dengan sesi pemilik:
- * database memeriksa lagi peran owner dan aal2, lalu mencatat audit tanpa data
+ * database memeriksa lagi peran owner (dan aal2 bila MFA dipasang), lalu mencatat audit tanpa data
  * pribadi. Log aplikasi hanya berisi kode galat.
  */
 

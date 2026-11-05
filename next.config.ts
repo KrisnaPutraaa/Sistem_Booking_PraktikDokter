@@ -48,7 +48,7 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   poweredByHeader: false,
-  // Next dev mencetak argumen Server Action ke terminal (bisa berisi email staf,
+  // Next dev mencetak argumen Server Action ke terminal (bisa berisi username staf,
   // token antrean, atau state formulir). Dimatikan: jangan log data pasien.
   logging: { serverFunctions: false },
   turbopack: {
@@ -58,6 +58,13 @@ const nextConfig: NextConfig = {
         as: "*.css",
       },
     },
+  },
+  // Satu halaman masuk untuk semua peran; alamat lain hanya pengalihan (307).
+  async redirects() {
+    return [
+      { source: "/dokter/masuk", destination: "/staf/masuk", permanent: false },
+      { source: "/owner/masuk", destination: "/staf/masuk", permanent: false },
+    ];
   },
   async headers() {
     return [

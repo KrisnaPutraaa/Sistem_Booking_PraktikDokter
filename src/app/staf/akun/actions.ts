@@ -9,13 +9,13 @@ import { RATE_LIMITED_MESSAGE, RATE_LIMITS } from "@/lib/rate-limit";
 import { allowAttempt } from "@/lib/rate-limit.server";
 import { type PasswordField, passwordChangeSchema } from "@/lib/staff/mfa-schemas";
 import { issueRecoveryCodes, logStaffEvent, removeAllFactors } from "@/lib/staff/mfa.server";
-import { canManageStaff, mfaRequiredFor } from "@/lib/staff/roles";
+import { canManageStaff } from "@/lib/staff/roles";
 import { STAFF_GENERIC_ERROR } from "@/lib/staff/schemas";
 import { currentStaff } from "@/lib/staff/session";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
- * Halaman Akun. Semua aksi memeriksa sesi penuh (aal2 bila wajib) di server.
+ * Halaman Akun. Semua aksi memeriksa sesi penuh (aal2 bila akun memasang MFA) di server.
  * Aksi pemilik atas akun lain memakai service_role setelah peran diperiksa, dan
  * dicatat di audit log (mfa.*, account.*) hanya dengan id akun.
  */
@@ -38,11 +38,11 @@ export async function regenerateRecoveryCodesAction(): Promise<CodesResult> {
   return { ok: true, codes };
 }
 
-/** Perawat boleh mematikan verifikasi dua langkah miliknya (opsional untuk perawat). */
+/** Staf boleh mematikan verifikasi dua langkah miliknya, kecuali saklar mfa_wajib menyala untuk perannya. */
 export async function disableOwnMfaAction(): Promise<{ ok: false; message: string }> {
   const staff = await currentStaff();
   if (!staff) return { ok: false, message: SESSION_EXPIRED };
-  if (mfaRequiredFor(staff.role)) {
+  if (staff.mfaRequired) {
     return { ok: false, message: "Verifikasi dua langkah wajib untuk dokter dan pemilik." };
   }
   const removed = await removeAllFactors(staff.userId);

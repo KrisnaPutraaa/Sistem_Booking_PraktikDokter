@@ -293,6 +293,7 @@ export type Database = {
         Args: { p_action: string; p_actor: string; p_data?: Json }
         Returns: undefined
       }
+      mfa_wajib: { Args: never; Returns: boolean }
       recovery_codes_remaining: { Args: { p_user: string }; Returns: number }
       replace_recovery_codes: {
         Args: { p_codes: string[]; p_user: string }

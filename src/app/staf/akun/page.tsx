@@ -6,8 +6,9 @@ import { MySecurityCard, PasswordCard, StaffAccountsCard } from "@/components/st
 import { StaffHeader, StaffTabs } from "@/components/staff/staff-header";
 import { listStaffAccounts } from "@/lib/staff/accounts";
 import { recoveryCodesRemaining } from "@/lib/staff/mfa.server";
-import { canManageStaff, mfaRequiredFor } from "@/lib/staff/roles";
+import { canManageStaff } from "@/lib/staff/roles";
 import { requireStaff } from "@/lib/staff/session";
+import { emailToUsername } from "@/lib/staff/username";
 import { APP_TIMEZONE } from "@/lib/time";
 
 export default function AkunPage() {
@@ -37,10 +38,10 @@ async function Account() {
         <div className="grid min-w-0 gap-6">
           <MySecurityCard
             fullName={staff.fullName}
-            email={staff.email}
+            username={displayUsername(staff.email)}
             role={staff.role}
             hasMfa={hasMfa}
-            mfaRequired={mfaRequiredFor(staff.role)}
+            mfaRequired={staff.mfaRequired}
             codesRemaining={codesRemaining}
           />
           {accounts ? (
@@ -49,7 +50,7 @@ async function Account() {
                 id: a.id,
                 fullName: a.fullName,
                 role: a.role,
-                email: a.email,
+                username: displayUsername(a.email),
                 hasMfa: a.hasMfa,
                 disabled: a.disabled,
                 lastSignIn: a.lastSignInAt
@@ -64,6 +65,11 @@ async function Account() {
       </div>
     </main>
   );
+}
+
+/** Akun lama yang belum dipetakan tetap tampil dengan emailnya. */
+function displayUsername(email: string): string {
+  return emailToUsername(email) ?? `${email} (belum dipetakan)`;
 }
 
 function AccountSkeleton() {

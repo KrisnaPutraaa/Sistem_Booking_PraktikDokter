@@ -109,7 +109,7 @@ function EnrollStep({
       <p className="mt-3 text-muted">
         {required
           ? "Akun dokter dan pemilik wajib memakai kode dari aplikasi di ponsel saat masuk. Jadi, kata sandi saja tidak cukup untuk membuka data pasien."
-          : "Opsional untuk perawat. Setelah dipasang, setiap kali masuk Anda diminta kode dari ponsel."}
+          : "Opsional. Setelah dipasang, setiap kali masuk Anda diminta kode dari ponsel."}
       </p>
 
       <ol className="mt-5 list-decimal space-y-2 pl-5 text-sm">

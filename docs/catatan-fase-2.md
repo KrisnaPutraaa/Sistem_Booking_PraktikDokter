@@ -73,8 +73,12 @@ Temuan saat Fase 1. Dicatat saja, belum diperbaiki (keputusan pemilik proyek).
 - **Migrasi `20261106000001_fase6.sql`** sudah di-push ke `praktik-tht-dev` saja. Produksi perlu `supabase db push`
   sendiri. Migrasi ini memasang `pgcrypto` (schema `extensions`) dan `pg_cron`, membuat schema `private`, serta
   menjadwalkan `praktik-pemeliharaan-harian` (03.00 WITA).
-- **Akun dokter dan owner yang sudah ada** (termasuk akun dev Krizzz dan dr. Dhena) wajib memasang verifikasi dua
-  langkah saat masuk berikutnya. Sebelum itu, database menolak akses mereka (aal1 = tanpa peran).
+- **Revisi pemilik (4 November 2026):** verifikasi dua langkah tidak wajib; login dengan username. Migrasi
+  `20261107000001_mfa_opsional.sql` sudah di-push ke `praktik-tht-dev` saja; produksi perlu `supabase db push`.
+- **Akun dev lama** harus dipetakan ke username `krisowner`, `krisdokter`, `krisperawat` dengan SQL di
+  `docs/prosedur-akun-staf-supabase.md` bagian C (dijalankan pemilik, belum dijalankan). Sebelum itu akun tersebut
+  tidak bisa masuk.
+- **Produksi:** buat akun staf langsung dengan username (prosedur bagian A). Tidak ada reset kata sandi lewat email.
 - **Teks privasi masih DRAF**: `src/app/kebijakan-privasi/page.tsx` (ada kotak "Draf" yang tampil ke pasien) dan
   teks centang di `src/app/ambil/take-queue-form.tsx`. Hal yang perlu ditinjau dokter dan pihak yang paham UU PDP:
   dasar pemrosesan dan bentuk persetujuan untuk data kesehatan (keluhan); transfer data ke luar negeri (Supabase
@@ -82,7 +86,7 @@ Temuan saat Fase 1. Dicatat saja, belum diperbaiki (keputusan pemilik proyek).
   notifikasi kebocoran di `docs/rencana-insiden-kebocoran-data.md`. Setelah disetujui: ubah `DRAFT_UPDATED`, hapus
   kotak Draf dan komentar DRAF.
 - **Nomor WhatsApp praktik** belum diisi. Isi di Pengaturan, Kontak dan privasi, supaya tampil di Kebijakan Privasi.
-- **Setelan Supabase Auth** (dev dan produksi): kata sandi minimal 12, TOTP aktif, pendaftaran publik mati, leaked
+- **Setelan Supabase Auth** (dev dan produksi): kata sandi minimal 12, TOTP aktif (untuk MFA sukarela), pendaftaran publik mati, leaked
   password protection bila tersedia. Daftar periksa di `docs/kebijakan-akun-staf.md`.
 - **GitHub**: aktifkan secret scanning. Setelah merge, Dependabot dan workflow CI berjalan. Pertimbangkan menjadikan
   CI sebagai *required check* di branch protection `main`.
