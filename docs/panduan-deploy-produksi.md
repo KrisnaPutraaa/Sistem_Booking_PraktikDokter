@@ -173,6 +173,14 @@ pendaftaran gagal tertutup (`src/lib/turnstile-config.ts`).
 
 ### A7. Project Vercel (Hobby)
 
+> **Status per 5 November 2026:**
+> - Project Vercel `antrean-dr-dhena` (Hobby) sudah dibuat. Enam variabel lingkungan Production sudah diisi; dua yang
+>   rahasia (`SUPABASE_SERVICE_ROLE_KEY`, `TURNSTILE_SECRET_KEY`) bertanda Secret.
+> - Project Supabase produksi `praktik-tht-prod` sudah dibuat, dan migrasi 9 berkas sudah terpasang (A2, A4).
+> - Kunci Turnstile asli sudah dibuat (A6).
+> - Di Vercel versi baru, tombol **Create Project** tidak langsung memulai deploy pertama. Deploy pertama dipicu
+>   lewat commit ke `main` (misalnya saat pull request di-merge), bukan lewat tombol **Deploy** di bawah.
+
 - [ ] Vercel, **Add New, Project**, impor repo GitHub. Nama project sesuai keputusan no. 2. Framework: **Next.js**
   (terdeteksi otomatis). Biarkan Build/Install command bawaan.
 - [ ] **Sebelum deploy pertama**, isi variabel lingkungan (tabel di bawah). Bila deploy sudah terlanjur jalan tanpa
@@ -207,7 +215,8 @@ Jangan diisi di Vercel:
 Penting: variabel `NEXT_PUBLIC_*` ditanam saat **build**. Setiap kali mengubahnya, lakukan **Redeploy** (tanpa build
 cache) supaya nilai baru terpakai.
 
-- [ ] Klik **Deploy**. Tunggu status *Ready*.
+- [ ] Klik **Deploy**. Tunggu status *Ready*. Bila tombol itu tidak ada (Vercel versi baru), deploy dimulai oleh
+  commit berikutnya ke `main`; pantau di tab **Deployments**.
 
 ### A8. Site URL dan Redirect URLs Supabase
 
